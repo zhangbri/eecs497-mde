@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LoginView: View {
+struct RegisterView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             Color(hex: "EBE3D7")
@@ -25,7 +25,7 @@ struct LoginView: View {
                 .padding(.top, UIScreen.main.bounds.height * 0.075)
                 Rectangle()
                     .fill(Color.white)
-                    .frame(width: 320, height: 367)
+                    .frame(width: 320, height: 332)
                     .cornerRadius(8)
                     .overlay(
                         VStack(alignment: .leading, spacing: 5) {
@@ -60,9 +60,9 @@ struct LoginView: View {
                                         .stroke(Color.gray, lineWidth: 1)
                                 )
                             Button(action: {
-                                print("Sign In tapped")
+                                print("Register tapped")
                             }) {
-                                Text("Sign In")
+                                Text("Register")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .foregroundColor(.black)
                                     .frame(width: 272, height: 40)
@@ -76,24 +76,13 @@ struct LoginView: View {
                              
                             }
                             Button(action: {
-                                print("Forgot password tapped")
+                                print("Already have an account tapped")
                             }) {
-                                Text("Forgot password?")
+                                Text("Already have an account?")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .underline()
                                     .foregroundColor(.black)
                                     .padding(.top, 9)
-                            }
-                   
-
-                            Button(action: {
-                                print("Don't have an account tapped")
-                            }) {
-                                Text("Don't have an account?")
-                                    .font(.custom("Moulpali-Regular", size: 16))
-                                    .underline()
-                                    .foregroundColor(.black)
-                                    .padding(.top, -5)
                             }
                         }
                             .padding(.top, 17.5)
@@ -113,22 +102,5 @@ struct LoginView: View {
 }
 
 #Preview {
-    LoginView()
-}
-
-// Helper extension to use hex codes
-extension Color {
-    init(hex: String) {
-        let scanner = Scanner(string: hex)
-        _ = scanner.scanString("#") // skip leading #
-        
-        var rgb: UInt64 = 0
-        scanner.scanHexInt64(&rgb)
-        
-        let r = Double((rgb >> 16) & 0xFF) / 255
-        let g = Double((rgb >> 8) & 0xFF) / 255
-        let b = Double(rgb & 0xFF) / 255
-        
-        self.init(.sRGB, red: r, green: g, blue: b, opacity: 1)
-    }
+    RegisterView()
 }
