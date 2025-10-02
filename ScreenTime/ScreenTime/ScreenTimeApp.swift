@@ -11,7 +11,7 @@ import SwiftUI
 struct ScreenTimeApp: App {
     var body: some Scene {
         WindowGroup {
-            LoginView()
+            AuthRootView() // no NavigationStack needed for this toggle
         }
     }
 }

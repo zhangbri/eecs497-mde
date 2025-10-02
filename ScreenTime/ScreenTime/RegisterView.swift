@@ -8,76 +8,56 @@
 import SwiftUI
 
 struct RegisterView: View {
+    var onTapAlreadyHaveAccount: () -> Void = {}
+
     var body: some View {
         ZStack(alignment: .topLeading) {
-            Color(hex: "EBE3D7")
-                .ignoresSafeArea()
+            Color(hex: "EBE3D7").ignoresSafeArea()
             VStack(spacing: 50) {
-                HStack() {
-                    Image("logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 109)
-                    Text(" pawse")
-                        .font(.custom("Moulpali-Regular", size: 64))
-
+                HStack {
+                    Image("logo").resizable().scaledToFit().frame(height: 109)
+                    Text(" pawse").font(.custom("Moulpali-Regular", size: 64))
                 }
                 .padding(.top, UIScreen.main.bounds.height * 0.075)
+
                 Rectangle()
                     .fill(Color.white)
                     .frame(width: 320, height: 332)
                     .cornerRadius(8)
                     .overlay(
                         VStack(alignment: .leading, spacing: 5) {
-                            Text("Email")
-                                .font(.custom("Moulpali-Regular", size: 16))
-                                .foregroundColor(.black)
-                                
+                            Text("Email").font(.custom("Moulpali-Regular", size: 16)).foregroundColor(.black)
                             TextField("Email", text: .constant(""))
                                 .font(.custom("Moulpali-Regular", size: 16))
                                 .padding(.leading, 16)
                                 .frame(width: 272, height: 40, alignment: .leading)
                                 .background(Color.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.gray, lineWidth: 1)
-                                )
-                        
-                            
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+
                             Text("Password")
                                 .font(.custom("Moulpali-Regular", size: 16))
                                 .foregroundColor(.black)
                                 .padding(.top, 12)
-                                
-        
+
                             TextField("Password", text: .constant(""))
                                 .font(.custom("Moulpali-Regular", size: 16))
                                 .padding(.leading, 16)
                                 .frame(width: 272, height: 40, alignment: .leading)
                                 .background(Color.white)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .stroke(Color.gray, lineWidth: 1)
-                                )
-                            Button(action: {
-                                print("Register tapped")
-                            }) {
+                                .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+
+                            Button(action: { print("Register tapped") }) {
                                 Text("Register")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .foregroundColor(.black)
                                     .frame(width: 272, height: 40)
                                     .background(Color(hex: "EBE3D7"))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 6)
-                                            .stroke(Color.black, lineWidth: 1)
-                                    )
+                                    .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.black, lineWidth: 1))
                                     .cornerRadius(6)
                                     .padding(.top, 17)
-                             
                             }
-                            Button(action: {
-                                print("Already have an account tapped")
-                            }) {
+
+                            Button(action: { onTapAlreadyHaveAccount() }) {
                                 Text("Already have an account?")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .underline()
@@ -85,21 +65,17 @@ struct RegisterView: View {
                                     .padding(.top, 9)
                             }
                         }
-                            .padding(.top, 17.5)
+                        .padding(.top, 17.5)
                         .padding(.leading, 23.5),
                         alignment: .topLeading
-                        
                     )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.black, lineWidth: 1)
-                )
-                .frame(maxWidth: .infinity)
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
+                    .frame(maxWidth: .infinity)
             }
         }
     }
-    
 }
+
 
 #Preview {
     RegisterView()
