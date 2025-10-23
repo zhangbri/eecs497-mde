@@ -65,7 +65,7 @@ struct LoginView: View {
                                     .padding(.top, 9)
                             }
 
-                            Button(action: { onTapCreateAccount() }) {
+                            Button(action: {  }) {
                                 Text("Don't have an account?")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .underline()

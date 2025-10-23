@@ -57,7 +57,7 @@ struct RegisterView: View {
                                     .padding(.top, 17)
                             }
 
-                            Button(action: { onTapAlreadyHaveAccount() }) {
+                            Button(action: {  }) {
                                 Text("Already have an account?")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .underline()

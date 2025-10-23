@@ -16,7 +16,7 @@ struct HomeView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 318, height: 318)
-                .offset(y: -160) 
+                .offset(y: -160)
             VStack {
                 HStack {
                     Image("logo")
