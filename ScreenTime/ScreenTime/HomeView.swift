@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct HomeView: View {
-
+    @State private var showingBlocking = false
     var body: some View {
         ZStack {
             Color(hex: "EBE3D7").ignoresSafeArea()
@@ -27,7 +27,7 @@ struct HomeView: View {
                 .foregroundColor(.black)
                 .offset(y: 70)
             Button(action: {
-                print("Start session tapped")
+                showingBlocking = true
             }) {
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color(hex: "646E61"))
@@ -53,7 +53,119 @@ struct HomeView: View {
                 
                 Spacer()
             }
+            if showingBlocking {
+                            ZStack {
+                                Color(hex: "EBE3D7").ignoresSafeArea()  // same as homescreen
+
+                                VStack(spacing: 24) {
+                                    // simple top bar with back button (optional)
+                                    HStack {
+                                        Button {
+                                            withAnimation(.easeInOut(duration: 0.25)) {
+                                                showingBlocking = false
+                                            }
+                                        } label: {
+                                            Image(systemName: "chevron.left")
+                                                .font(.system(size: 18, weight: .semibold))
+                                                .foregroundColor(.black)
+                                                .padding(.horizontal, 12)
+                                                .padding(.vertical, 8)
+                                        }
+                                        Spacer()
+                                    }
+                                    .padding(.top, 8)
+                                    .padding(.horizontal, 8)
+
+                                    Spacer()
+
+                                    // the “big rectangle + inner rectangles” content
+                                    BlockingSetupContent(
+                                        onBegin: { print("Begin blocking tapped") }
+                                    )
+
+                                    Spacer()
+                                }
+                                .padding(.horizontal, 20)
+                            }
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                            .zIndex(1) // ensure above homescreen
+                        }
         }
+    }
+}
+
+private struct BlockingSetupContent: View {
+    var onBegin: () -> Void
+
+    var body: some View {
+        // Big white container
+        RoundedRectangle(cornerRadius: 16)
+            .fill(Color.white)
+            .frame(width: 340, height: 240)
+            .overlay(
+                VStack(spacing: 18) {
+                    HStack(spacing: 25) {
+                        // FROM
+                        VStack(spacing: 6) {
+                            Text("from")
+                                .font(.custom("Sarabun-Regular", size: 16))
+                                .foregroundColor(.black)
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.white)
+                                .frame(width: 120, height: 60)
+                                .overlay(
+                                    Text("12:00am")
+                                        .font(.custom("Moulpali-Regular", size: 28))
+                                        .foregroundColor(.black)
+                                )
+                                .overlay( // subtle border instead of shadow
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.black.opacity(0.12), lineWidth: 1)
+                                )
+                        }
+                        // TO
+                        VStack(spacing: 6) {
+                            Text("to")
+                                .font(.custom("Sarabun-Regular", size: 16))
+                                .foregroundColor(.black)
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.white)
+                                .frame(width: 120, height: 60)
+                                .overlay(
+                                    Text("6:07am")
+                                        .font(.custom("Moulpali-Regular", size: 28))
+                                        .foregroundColor(.black)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.black.opacity(0.12), lineWidth: 1)
+                                )
+                        }
+                    }
+
+                    Text("6h 7m of blocking")
+                        .font(.custom("Sarabun-Regular", size: 16))
+                        .foregroundColor(.black)
+
+                    Button(action: onBegin) {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: "646E61"))
+                            .frame(width: 200, height: 45)
+                            .overlay(
+                                Text("begin blocking")
+                                    .font(.custom("Sarabun-Regular", size: 18))
+                                    .foregroundColor(.white)
+                            )
+                    }
+                    .padding(.top, 2)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+            )
+            .overlay( // subtle container border
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.black.opacity(0.15), lineWidth: 1)
+            )
     }
 }
 
