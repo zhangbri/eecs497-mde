@@ -54,42 +54,14 @@ struct HomeView: View {
                 Spacer()
             }
             if showingBlocking {
-                            ZStack {
-                                Color(hex: "EBE3D7").ignoresSafeArea()  // same as homescreen
+                ZStack {
+                    Color(hex: "EBE3D7").ignoresSafeArea()
+                        BlockingSetupContent(
+                            onBegin: { print("Begin blocking tapped") }
+                        )
 
-                                VStack(spacing: 24) {
-                                    // simple top bar with back button (optional)
-                                    HStack {
-                                        Button {
-                                            withAnimation(.easeInOut(duration: 0.25)) {
-                                                showingBlocking = false
-                                            }
-                                        } label: {
-                                            Image(systemName: "chevron.left")
-                                                .font(.system(size: 18, weight: .semibold))
-                                                .foregroundColor(.black)
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 8)
-                                        }
-                                        Spacer()
-                                    }
-                                    .padding(.top, 8)
-                                    .padding(.horizontal, 8)
-
-                                    Spacer()
-
-                                    // the “big rectangle + inner rectangles” content
-                                    BlockingSetupContent(
-                                        onBegin: { print("Begin blocking tapped") }
-                                    )
-
-                                    Spacer()
-                                }
-                                .padding(.horizontal, 20)
-                            }
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                            .zIndex(1) // ensure above homescreen
-                        }
+                }
+            }
         }
     }
 }
@@ -98,14 +70,12 @@ private struct BlockingSetupContent: View {
     var onBegin: () -> Void
 
     var body: some View {
-        // Big white container
         RoundedRectangle(cornerRadius: 16)
             .fill(Color.white)
             .frame(width: 340, height: 240)
             .overlay(
                 VStack(spacing: 18) {
                     HStack(spacing: 25) {
-                        // FROM
                         VStack(spacing: 6) {
                             Text("from")
                                 .font(.custom("Sarabun-Regular", size: 16))
@@ -118,12 +88,11 @@ private struct BlockingSetupContent: View {
                                         .font(.custom("Moulpali-Regular", size: 28))
                                         .foregroundColor(.black)
                                 )
-                                .overlay( // subtle border instead of shadow
+                                .overlay(
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(Color.black.opacity(0.12), lineWidth: 1)
                                 )
                         }
-                        // TO
                         VStack(spacing: 6) {
                             Text("to")
                                 .font(.custom("Sarabun-Regular", size: 16))
@@ -157,14 +126,7 @@ private struct BlockingSetupContent: View {
                                     .foregroundColor(.white)
                             )
                     }
-                    .padding(.top, 2)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-            )
-            .overlay( // subtle container border
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.black.opacity(0.15), lineWidth: 1)
             )
     }
 }
