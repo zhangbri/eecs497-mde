@@ -6,9 +6,15 @@
 //
 
 import SwiftUI
+import FamilyControls
+import ManagedSettings
+import DeviceActivity
 
 struct HomeView: View {
     @State private var showingBlocking = false
+    @State private var isPickerPresented = false
+    @StateObject private var screenTimeManager = ScreenTimeManager.shared
+    
     var body: some View {
         ZStack {
             Color(hex: "EBE3D7").ignoresSafeArea()
@@ -26,6 +32,23 @@ struct HomeView: View {
                 .font(.custom("Sarabun-Thin", size: 30))
                 .foregroundColor(.black)
                 .offset(y: 70)
+            Button(action: {
+                isPickerPresented = true
+            }) {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color(hex: "646E61"))
+                    .frame(width: 235, height: 49)
+                    .overlay(
+                        Text("choose apps to block")
+                            .font(.custom("Sarabun-Regular", size: 18))
+                            .foregroundColor(.white)
+                    )
+            }
+            .familyActivityPicker(
+                isPresented: $isPickerPresented,
+                selection: $screenTimeManager.selection
+            )
+            .offset(y: 200)
             Button(action: {
                 showingBlocking = true
             }) {
@@ -69,21 +92,24 @@ struct HomeView: View {
                         .padding(.leading, 15)
                         
                         // Card content
-                        BlockingSetupContent {
-                            // start blocking
+                        BlockingSetupContent(onBegin: {
                             showingBlocking = false
-                        }
+                        }, screenTimeManager: screenTimeManager)
                         .frame(maxWidth: .infinity)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
             }
         }
+        .onAppear {
+            screenTimeManager.requestAuthorization()
+        }
     }
 }
 
 private struct BlockingSetupContent: View {
     var onBegin: () -> Void
+    @ObservedObject var screenTimeManager: ScreenTimeManager
     
     var body: some View {
         RoundedRectangle(cornerRadius: 20)
@@ -101,7 +127,10 @@ private struct BlockingSetupContent: View {
                         .font(.custom("Sarabun-Light", size: 20))
                         .padding(.top, 2)
                     
-                    Button(action: onBegin) {
+                    Button(action: {
+                        screenTimeManager.startBlocking()
+                        onBegin()
+                    }) {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color(hex: "646E61"))
                             .frame(width: 235, height: 49)
