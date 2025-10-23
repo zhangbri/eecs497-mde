@@ -46,7 +46,7 @@ struct HomeView: View {
                         .scaledToFit()
                         .frame(height: 49)
                     Text("pawse")
-                        .font(.custom("Moulpali-Regular", size: 30))
+                        .font(.custom("VictorMono-Regular", size: 30))
                     Spacer()
                 }
                 .padding(.leading, 15)
@@ -55,11 +55,27 @@ struct HomeView: View {
             }
             if showingBlocking {
                 ZStack {
-                    Color(hex: "EBE3D7").ignoresSafeArea()
-                        BlockingSetupContent(
-                            onBegin: { print("Begin blocking tapped") }
-                        )
-
+                    Color(hex: "EBE3D7")
+                        .ignoresSafeArea()
+                        .contentShape(Rectangle())
+                        .onTapGesture { showingBlocking = false }
+                    
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            Image("logo").resizable().scaledToFit().frame(height: 49)
+                            Text("pawse").font(.custom("VictorMono-Regular", size: 30))
+                            Spacer()
+                        }
+                        .padding(.leading, 15)
+                        
+                        // Card content
+                        BlockingSetupContent {
+                            // start blocking
+                            showingBlocking = false
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
             }
         }
@@ -68,70 +84,59 @@ struct HomeView: View {
 
 private struct BlockingSetupContent: View {
     var onBegin: () -> Void
-
+    
     var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color.white)
-            .frame(width: 340, height: 240)
+        RoundedRectangle(cornerRadius: 20)
+            .fill(Color(hex: "F2EDE7"))
+            .frame(width: 380, height: 244)
             .overlay(
-                VStack(spacing: 18) {
-                    HStack(spacing: 25) {
-                        VStack(spacing: 6) {
-                            Text("from")
-                                .font(.custom("Sarabun-Regular", size: 16))
-                                .foregroundColor(.black)
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.white)
-                                .frame(width: 120, height: 60)
-                                .overlay(
-                                    Text("12:00am")
-                                        .font(.custom("Moulpali-Regular", size: 28))
-                                        .foregroundColor(.black)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.black.opacity(0.12), lineWidth: 1)
-                                )
-                        }
-                        VStack(spacing: 6) {
-                            Text("to")
-                                .font(.custom("Sarabun-Regular", size: 16))
-                                .foregroundColor(.black)
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.white)
-                                .frame(width: 120, height: 60)
-                                .overlay(
-                                    Text("6:07am")
-                                        .font(.custom("Moulpali-Regular", size: 28))
-                                        .foregroundColor(.black)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.black.opacity(0.12), lineWidth: 1)
-                                )
-                        }
+                VStack() {
+                    HStack() {
+                        TimeCard(title: "from", timeText: "12:00am")
+                        TimeCard(title: "to",   timeText: "6:07am")
                     }
-
+                    
+                    // Duration
                     Text("6h 7m of blocking")
-                        .font(.custom("Sarabun-Regular", size: 16))
-                        .foregroundColor(.black)
-
+                        .font(.custom("Sarabun-Light", size: 20))
+                        .padding(.top, 2)
+                    
                     Button(action: onBegin) {
-                        RoundedRectangle(cornerRadius: 12)
+                        RoundedRectangle(cornerRadius: 15)
                             .fill(Color(hex: "646E61"))
-                            .frame(width: 200, height: 45)
+                            .frame(width: 235, height: 49)
                             .overlay(
                                 Text("begin blocking")
-                                    .font(.custom("Sarabun-Regular", size: 18))
+                                    .font(.custom("Sarabun-Regular", size: 20))
                                     .foregroundColor(.white)
                             )
                     }
                 }
             )
+            .onTapGesture { /* keep taps inside from dismissing */ }
     }
 }
 
 
-#Preview {
-    HomeView()
+private struct TimeCard: View {
+    let title: String
+    let timeText: String
+    
+    var body: some View {
+        VStack() {
+            Text(title)
+                .font(.custom("Sarabun-Regular", size: 20))
+
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(hex: "F5F5F5"))
+                .frame(width: 160, height: 86)
+                .overlay(
+                    Text(timeText)
+                        .font(.custom("VictorMono-Regular", size: 40))
+                        .foregroundColor(.black)
+                )
+        }
+    }
 }
+
+#Preview { HomeView() }
