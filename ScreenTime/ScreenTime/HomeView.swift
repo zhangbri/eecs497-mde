@@ -6,14 +6,23 @@
 //
 
 import SwiftUI
+import Combine
 import FamilyControls
-import ManagedSettings
-import DeviceActivity
+//import ManagedSettings
+//import DeviceActivity
 
 struct HomeView: View {
     @State private var showingBlocking = false
     @State private var isPickerPresented = false
     @StateObject private var screenTimeManager = ScreenTimeManager.shared
+    @State private var isSessionRunning = false
+    @State private var elapsedSeconds = 0
+    private let ticker = Timer
+            .publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+    private var hours: Int   { elapsedSeconds / 3600 }
+    private var minutes: Int { (elapsedSeconds % 3600) / 60 }
+    private var seconds: Int { elapsedSeconds % 60 }
     
     var body: some View {
         ZStack {
@@ -24,14 +33,16 @@ struct HomeView: View {
                 .frame(width: 318, height: 318)
                 .offset(y: -160)
             
-            Text("0h 0m")
+            Text("\(hours)h \(minutes)m \(seconds)s")
                 .font(.custom("Moulpali-Regular", size: 65))
                 .foregroundColor(.black)
                 .offset(y: 25)
+            
             Text("hours saved")
                 .font(.custom("Sarabun-Thin", size: 30))
                 .foregroundColor(.black)
                 .offset(y: 70)
+            
             Button(action: {
                 isPickerPresented = true
             }) {
@@ -62,6 +73,19 @@ struct HomeView: View {
                     )
             }
             .offset(y: 125)
+            Button(action: toggleTimerSession) {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color(hex: "646E61"))
+                    .frame(width: 235, height: 49)
+                    .overlay(
+                        Text(isSessionRunning ? "stop session" : "start session")
+                            .font(.custom("Sarabun-Regular", size: 20))
+                            .foregroundColor(.white)
+                    )
+            }
+            .offset(y: 260)
+
+            .opacity(isSessionRunning ? 0.7 : 1)
             VStack {
                 HStack {
                     Image("logo")
@@ -91,25 +115,38 @@ struct HomeView: View {
                         }
                         .padding(.leading, 15)
                         
-                        // Card content
                         BlockingSetupContent(onBegin: {
                             showingBlocking = false
-                        }, screenTimeManager: screenTimeManager)
+                        })
                         .frame(maxWidth: .infinity)
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
             }
         }
-        .onAppear {
-            screenTimeManager.requestAuthorization()
+        //.onAppear {
+            //screenTimeManager.requestAuthorization()
+        //}
+        .onReceive(ticker) { _ in
+            if isSessionRunning { elapsedSeconds += 1 }
+        }
+
+    }
+    private func toggleTimerSession() {
+        if isSessionRunning {
+            // Stop timer
+            isSessionRunning = false
+        } else {
+            // Start or restart timer
+            elapsedSeconds = 0
+            isSessionRunning = true
         }
     }
 }
 
 private struct BlockingSetupContent: View {
     var onBegin: () -> Void
-    @ObservedObject var screenTimeManager: ScreenTimeManager
+    //@ObservedObject var screenTimeManager: ScreenTimeManager
     
     var body: some View {
         RoundedRectangle(cornerRadius: 20)
@@ -128,7 +165,7 @@ private struct BlockingSetupContent: View {
                         .padding(.top, 2)
                     
                     Button(action: {
-                        screenTimeManager.startBlocking()
+                        //screenTimeManager.startBlocking()
                         onBegin()
                     }) {
                         RoundedRectangle(cornerRadius: 15)
