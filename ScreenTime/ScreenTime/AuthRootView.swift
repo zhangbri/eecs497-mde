@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum AuthScreen { case login, register }
+enum AuthScreen { case login, register, home }
 
 struct AuthRootView: View {
     @State private var screen: AuthScreen = .login
@@ -16,11 +16,16 @@ struct AuthRootView: View {
         Group {
             switch screen {
             case .login:
-                LoginView(onTapCreateAccount: { screen = .register })
+                LoginView(
+                    onTapCreateAccount: { screen = .register },
+                    onSignInSuccess: { screen = .home }
+                )
             case .register:
                 RegisterView(onTapAlreadyHaveAccount: { screen = .login })
+            case .home:
+                HomeView()
             }
         }
-        .animation(.easeInOut, value: screen) // optional crossfade
+        .animation(.easeInOut, value: screen)
     }
 }

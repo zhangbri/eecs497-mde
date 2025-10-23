@@ -17,6 +17,28 @@ struct HomeView: View {
                 .scaledToFit()
                 .frame(width: 318, height: 318)
                 .offset(y: -160)
+            
+            Text("0h 0m")
+                .font(.custom("Moulpali-Regular", size: 65))
+                .foregroundColor(.black)
+                .offset(y: 25)
+            Text("hours saved")
+                .font(.custom("Sarabun-Thin", size: 30))
+                .foregroundColor(.black)
+                .offset(y: 70)
+            Button(action: {
+                print("Start session tapped")
+            }) {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color(hex: "646E61"))
+                    .frame(width: 235, height: 49)
+                    .overlay(
+                        Text("start session")
+                            .font(.custom("Sarabun-Regular", size: 20))
+                            .foregroundColor(.white)
+                    )
+            }
+            .offset(y: 125)
             VStack {
                 HStack {
                     Image("logo")

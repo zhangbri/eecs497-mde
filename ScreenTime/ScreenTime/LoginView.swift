@@ -9,7 +9,7 @@ import SwiftUI
 
 struct LoginView: View {
     var onTapCreateAccount: () -> Void = {}
-
+    var onSignInSuccess: () -> Void = {}
     var body: some View {
         ZStack(alignment: .topLeading) {
             Color(hex: "EBE3D7").ignoresSafeArea()
@@ -46,7 +46,9 @@ struct LoginView: View {
                                 .background(Color.white)
                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
 
-                            Button(action: { print("Sign In tapped") }) {
+                            Button(action: { print("Sign In tapped")
+                                onSignInSuccess()
+                            }) {
                                 Text("Sign In")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .foregroundColor(.black)

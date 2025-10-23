@@ -7,6 +7,8 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Moulpali-Regular.ttf</string>
+		<string>Sarabun-Regular.ttf</string>
+		<string>Sarabun-Thin.ttf</string>
 	</array>
 </dict>
 </plist>
