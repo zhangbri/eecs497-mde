@@ -22,7 +22,6 @@ struct HomeView: View {
             .autoconnect()
     private var hours: Int   { elapsedSeconds / 3600 }
     private var minutes: Int { (elapsedSeconds % 3600) / 60 }
-    private var seconds: Int { elapsedSeconds % 60 }
     
     var body: some View {
         ZStack {
@@ -33,7 +32,7 @@ struct HomeView: View {
                 .frame(width: 318, height: 318)
                 .offset(y: -160)
             
-            Text("\(hours)h \(minutes)m \(seconds)s")
+            Text("\(hours)h \(minutes)m")
                 .font(.custom("Moulpali-Regular", size: 65))
                 .foregroundColor(.black)
                 .offset(y: 25)
@@ -43,49 +42,71 @@ struct HomeView: View {
                 .foregroundColor(.black)
                 .offset(y: 70)
             
-            Button(action: {
-                isPickerPresented = true
-            }) {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color(hex: "646E61"))
-                    .frame(width: 235, height: 49)
-                    .overlay(
-                        Text("choose apps to block")
-                            .font(.custom("Sarabun-Regular", size: 18))
-                            .foregroundColor(.white)
-                    )
-            }
-            .familyActivityPicker(
-                isPresented: $isPickerPresented,
-                selection: $screenTimeManager.selection
-            )
-            .offset(y: 200)
-            Button(action: {
-                showingBlocking = true
-            }) {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color(hex: "646E61"))
-                    .frame(width: 235, height: 49)
-                    .overlay(
-                        Text("start session")
+            // Timer Setup UI
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: "F2EDE7"))
+                .frame(width: 380, height: 225)
+                .overlay(
+                    VStack (spacing: 12){
+                        Text("set timer")
                             .font(.custom("Sarabun-Regular", size: 20))
-                            .foregroundColor(.white)
-                    )
-            }
-            .offset(y: 125)
-            Button(action: toggleTimerSession) {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color(hex: "646E61"))
-                    .frame(width: 235, height: 49)
-                    .overlay(
-                        Text(isSessionRunning ? "stop session" : "start session")
-                            .font(.custom("Sarabun-Regular", size: 20))
-                            .foregroundColor(.white)
-                    )
-            }
-            .offset(y: 260)
+                        
+                        HStack (spacing: 48){
+                            // Hours
+                            HStack (spacing: 15){
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.white)
+                                    .frame(width: 80, height: 87)
+                                    .overlay(
+                                        Text("\(hours)")
+                                            .font(.custom("VictorMono-Regular", size: 40))
+                                            .foregroundColor(.black)
+                                    )
+                                
+                                Text("hr")
+                                    .font(.custom("VictorMono-Regular", size: 40))
+                                    .foregroundColor(.black)
+                            }
+                            
+                            // Minutes
+                            HStack (spacing: 15){
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.white)
+                                    .frame(width: 80, height: 87)
+                                    .overlay(
+                                        Text("\(minutes)")
+                                            .font(.custom("VictorMono-Regular", size: 40))
+                                            .foregroundColor(.black)
+                                    )
+                                
+                                Text("min")
+                                    .font(.custom("VictorMono-Regular", size: 40))
+                                    .foregroundColor(.black)
+                            }
+                        }
 
-            .opacity(isSessionRunning ? 0.7 : 1)
+                        
+                        Button(action: {
+                            elapsedSeconds = 0
+                            isSessionRunning = true
+                        }) {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color(hex: "646E61"))
+                                .frame(width: 235, height: 45)
+                                .overlay(
+                                    Text("begin session")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                        .foregroundColor(.white)
+                                )
+                        }
+                        .offset(y: 10)
+                    }
+                    .offset(y: -10)
+                )
+                .offset(y: 225)
+                .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
+
+
             VStack {
                 HStack {
                     Image("logo")
@@ -100,109 +121,7 @@ struct HomeView: View {
                 
                 Spacer()
             }
-            if showingBlocking {
-                ZStack {
-                    Color(hex: "EBE3D7")
-                        .ignoresSafeArea()
-                        .contentShape(Rectangle())
-                        .onTapGesture { showingBlocking = false }
-                    
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image("logo").resizable().scaledToFit().frame(height: 49)
-                            Text("pawse").font(.custom("VictorMono-Regular", size: 30))
-                            Spacer()
-                        }
-                        .padding(.leading, 15)
-                        
-                        BlockingSetupContent(onBegin: {
-                            showingBlocking = false
-                        })
-                        .frame(maxWidth: .infinity)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                }
-            }
-        }
-        //.onAppear {
-            //screenTimeManager.requestAuthorization()
-        //}
-        .onReceive(ticker) { _ in
-            if isSessionRunning { elapsedSeconds += 1 }
-        }
-
-    }
-    private func toggleTimerSession() {
-        if isSessionRunning {
-            // Stop timer
-            isSessionRunning = false
-        } else {
-            // Start or restart timer
-            elapsedSeconds = 0
-            isSessionRunning = true
         }
     }
 }
-
-private struct BlockingSetupContent: View {
-    var onBegin: () -> Void
-    //@ObservedObject var screenTimeManager: ScreenTimeManager
-    
-    var body: some View {
-        RoundedRectangle(cornerRadius: 20)
-            .fill(Color(hex: "F2EDE7"))
-            .frame(width: 380, height: 244)
-            .overlay(
-                VStack() {
-                    HStack() {
-                        TimeCard(title: "from", timeText: "12:00am")
-                        TimeCard(title: "to",   timeText: "6:07am")
-                    }
-                    
-                    // Duration
-                    Text("6h 7m of blocking")
-                        .font(.custom("Sarabun-Light", size: 20))
-                        .padding(.top, 2)
-                    
-                    Button(action: {
-                        //screenTimeManager.startBlocking()
-                        onBegin()
-                    }) {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color(hex: "646E61"))
-                            .frame(width: 235, height: 49)
-                            .overlay(
-                                Text("begin blocking")
-                                    .font(.custom("Sarabun-Regular", size: 20))
-                                    .foregroundColor(.white)
-                            )
-                    }
-                }
-            )
-            .onTapGesture { /* keep taps inside from dismissing */ }
-    }
-}
-
-
-private struct TimeCard: View {
-    let title: String
-    let timeText: String
-    
-    var body: some View {
-        VStack() {
-            Text(title)
-                .font(.custom("Sarabun-Regular", size: 20))
-
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(hex: "F5F5F5"))
-                .frame(width: 160, height: 86)
-                .overlay(
-                    Text(timeText)
-                        .font(.custom("VictorMono-Regular", size: 40))
-                        .foregroundColor(.black)
-                )
-        }
-    }
-}
-
 #Preview { HomeView() }
