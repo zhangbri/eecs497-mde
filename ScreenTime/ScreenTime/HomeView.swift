@@ -191,10 +191,14 @@ struct HomeView: View {
             }
         }
         .fullScreenCover(isPresented: $showSession) {
-            SessionView(totalSeconds: sessionLengthSeconds) {
+            SessionView(totalSeconds: sessionLengthSeconds) { didComplete, secondsEarned in
                 showSession = false
+                if didComplete {
+                    elapsedSeconds += secondsEarned
+                }
             }
         }
+
     }
 
     private func sanitize(_ text: inout String, maxDigits: Int) {
@@ -224,7 +228,7 @@ struct HomeView: View {
 struct SessionView: View {
     @Environment(\.scenePhase) private var scenePhase
     let totalSeconds: Int
-    var onEnd: () -> Void
+    var onEnd: (_ didComplete: Bool, _ secondsEarned: Int) -> Void
 
     @Environment(\.dismiss) private var dismiss
     @AppStorage("coins") private var coins: Int = 0
@@ -233,6 +237,8 @@ struct SessionView: View {
     @State private var lastAwardedMinute = 0
     @State private var sessionCoins: Int = 0
     @State private var showConfirmEnd = false
+    @State private var endedBecauseLeftApp = false
+
 
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -293,45 +299,49 @@ struct SessionView: View {
                         .offset(x: 20, y: -75)
                         .animation(.easeOut(duration: 0.3), value: coins)
                 }
-                .offset(y: 35)
+                .offset(y: -40)
                 
-                (
-                    Text("blocking until ")
-                        .font(.custom("Sarabun-Thin", size: 30))
-                        .foregroundColor(.black)
-                  +
-                    Text(endTimeString)
-                        .font(.custom("Sarabun-Regular", size: 30))
-                )
-                .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 5)
-
-                Text(hmsString)
-                    .font(.custom("Moulpali-Regular", size: 65))
-                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                    .offset(y: -30)
-                Text("current session")
-                    .font(.custom("Sarabun-Thin", size: 30))
+                Group {
+                    (
+                        Text("blocking until ")
+                            .font(.custom("Sarabun-Thin", size: 30))
+                            .foregroundColor(.black)
+                      +
+                        Text(endTimeString)
+                            .font(.custom("Sarabun-Regular", size: 30))
+                    )
                     .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 5)
-                    .offset(y: -75)
 
-                Button {
-                    if sessionCoins > 0 && remaining > 0 {
-                        showConfirmEnd = true
-                    } else {
-                        endNow()
-                    }
-                } label: {
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color(hex: "B14B39"))
-                        .frame(width: 235, height: 49)
+                    Text(hmsString)
+                        .font(.custom("Moulpali-Regular", size: 65))
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                        .overlay(
-                            Text("end session")
-                                .font(.custom("Sarabun-Regular", size: 20))
-                                .foregroundColor(.white)
-                        )
+                        .offset(y: -30)
+
+                    Text("current session")
+                        .font(.custom("Sarabun-Thin", size: 30))
+                        .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 5)
+                        .offset(y: -75)
+
+                    Button {
+                        if sessionCoins > 0 && remaining > 0 {
+                            showConfirmEnd = true
+                        } else {
+                            endNow()
+                        }
+                    } label: {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color(hex: "B14B39"))
+                            .frame(width: 235, height: 49)
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                            .overlay(
+                                Text("end session")
+                                    .font(.custom("Sarabun-Regular", size: 20))
+                                    .foregroundColor(.white)
+                            )
+                    }
+                    .offset(y: -85)
                 }
-                .offset(y: -85)
+                .offset(y: -70)
                 .alert("End your session early?", isPresented: $showConfirmEnd) {
                     Button("End now", role: .destructive) {
                         endNow()
@@ -345,7 +355,7 @@ struct SessionView: View {
                     .multilineTextAlignment(.center)
                     .font(.custom("Sarabun-Thin", size: 15))
                     .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                    .offset(y: -80)
+                    .offset(y: -150)
             }
         }
         .onAppear {
@@ -364,20 +374,30 @@ struct SessionView: View {
             }
             if remaining == 0 {
                 coins += sessionCoins
-                endNow()
+                completeSession()
             }
         }
-        .onChange(of: scenePhase) { newPhase in
-            if newPhase == .background || newPhase == .inactive {
-                if sessionCoins > 0 && remaining > 0 {
-                    showConfirmEnd = true
-                }
+        
+        .onChange(of: scenePhase) { phase in
+            if phase == .background {
+                endNow()
+                endedBecauseLeftApp = true
             }
+        }
+        .alert("Session ended", isPresented: $endedBecauseLeftApp) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("You left the app, so the session ended early.")
         }
     }
 
     private func endNow() {
-        onEnd()
+        onEnd(false, 0)
+        dismiss()
+    }
+
+    private func completeSession() {
+        onEnd(true, totalSeconds)
         dismiss()
     }
 }
