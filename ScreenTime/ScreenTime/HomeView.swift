@@ -71,12 +71,6 @@ struct HomeView: View {
                                             .multilineTextAlignment(.center)
                                             .foregroundColor(.black)
                                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                            .onTapGesture {
-                                                if !clearedHourOnce {
-                                                    hourText = ""
-                                                    clearedHourOnce = true
-                                                }
-                                            }
                                             .onChange(of: hourText) { _ in
                                                 sanitize(&hourText, maxDigits: 2)
                                             }
@@ -102,12 +96,7 @@ struct HomeView: View {
                                             .multilineTextAlignment(.center)
                                             .foregroundColor(.black)
                                             .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                            .onTapGesture {
-                                                if !clearedMinuteOnce {
-                                                    minuteText = ""
-                                                    clearedMinuteOnce = true
-                                                }
-                                            }
+                      
                                             .onChange(of: minuteText) { _ in
                                                 sanitize(&minuteText, maxDigits: 2)
                                             }

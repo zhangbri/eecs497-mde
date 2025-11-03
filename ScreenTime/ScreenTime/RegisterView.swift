@@ -9,7 +9,8 @@ import SwiftUI
 
 struct RegisterView: View {
     var onTapAlreadyHaveAccount: () -> Void = {}
-
+    @Environment(\.dismiss) private var dismiss
+    
     var body: some View {
         ZStack(alignment: .topLeading) {
             Color(hex: "EBE3D7").ignoresSafeArea()
@@ -57,7 +58,9 @@ struct RegisterView: View {
                                     .padding(.top, 17)
                             }
 
-                            Button(action: {  }) {
+                            Button(action: {
+                                dismiss()
+                            }) {
                                 Text("Already have an account?")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .underline()
@@ -73,10 +76,13 @@ struct RegisterView: View {
                     .frame(maxWidth: .infinity)
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 }
 
 
 #Preview {
-    RegisterView()
+    NavigationStack {
+        RegisterView()
+    }
 }
