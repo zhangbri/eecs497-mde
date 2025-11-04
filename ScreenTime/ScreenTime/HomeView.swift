@@ -9,6 +9,8 @@ import SwiftUI
 import Combine
 
 struct HomeView: View {
+    @State private var selectedTab: PawseTab = .home
+    private let barHeight: CGFloat = 78
     @AppStorage("coins") private var coins: Int = 0
     @State private var elapsedSeconds = 0
     private var hours: Int   { elapsedSeconds / 3600 }
@@ -30,153 +32,165 @@ struct HomeView: View {
     @State private var sessionLengthSeconds = 0
 
     var body: some View {
-        ZStack {
-            Color(hex: "EBE3D7").ignoresSafeArea()
-
-            Image("graycat")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 318, height: 318)
-                .offset(y: -160)
-
-            Text("\(hours)h \(minutes)m")
-                .font(.custom("Moulpali-Regular", size: 65))
-                .foregroundColor(.black)
-                .offset(y: 25)
-
-            Text("hours saved")
-                .font(.custom("Sarabun-Thin", size: 30))
-                .foregroundColor(.black)
-                .offset(y: 70)
-
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(hex: "F2EDE7"))
-                .frame(width: 380, height: 225)
-                .overlay(
-                    VStack (spacing: 12) {
-                        Text("set timer")
-                            .font(.custom("Sarabun-Regular", size: 20))
-                            .foregroundColor(.black)
-
-                        HStack (spacing: 45) {
-                            HStack (spacing: 15) {
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.white)
-                                    .frame(width: 80, height: 87)
-                                    .overlay(
-                                        TextField("", text: $hourText)
-                                            .keyboardType(.numberPad)
-                                            .focused($focusedField, equals: .hours)
-                                            .font(.custom("VictorMono-Regular", size: 40))
-                                            .multilineTextAlignment(.center)
-                                            .foregroundColor(.black)
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                            .onChange(of: hourText) { _ in
-                                                sanitize(&hourText, maxDigits: 2)
-                                            }
-                                            .onSubmit {
-                                                clampHours()
-                                            }
-                                    )
-
-                                Text("hr")
-                                    .font(.custom("VictorMono-Regular", size: 40))
-                                    .foregroundColor(.black)
-                            }
-
-                            HStack (spacing: 15) {
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.white)
-                                    .frame(width: 80, height: 87)
-                                    .overlay(
-                                        TextField("", text: $minuteText)
-                                            .keyboardType(.numberPad)
-                                            .focused($focusedField, equals: .minutes)
-                                            .font(.custom("VictorMono-Regular", size: 40))
-                                            .multilineTextAlignment(.center)
-                                            .foregroundColor(.black)
-                                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                      
-                                            .onChange(of: minuteText) { _ in
-                                                sanitize(&minuteText, maxDigits: 2)
-                                            }
-                                            .onSubmit {
-                                                clampMinutes()
-                                            }
-                                    )
-
-                                Text("min")
-                                    .font(.custom("VictorMono-Regular", size: 40))
-                                    .foregroundColor(.black)
-                            }
-                        }
-                        .onChange(of: focusedField) { newFocus in
-                            if newFocus != .hours { clampHours() }
-                            if newFocus != .minutes { clampMinutes() }
-                        }
-
-                        Button(action: {
-                            clampHours()
-                            clampMinutes()
-                            focusedField = nil
-                            let total = (selectedHours * 3600) + (selectedMinutes * 60)
-                            sessionLengthSeconds = total
-                            showSession = true
-                        }) {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color(hex: "646E61"))
-                                .frame(width: 235, height: 45)
-                                .overlay(
-                                    Text("begin session")
-                                        .font(.custom("Sarabun-Regular", size: 20))
-                                        .foregroundColor(.white)
-                                )
-                        }
-                        .disabled(!canStartSession)
-                        .opacity(canStartSession ? 1.0 : 0.5)
-                        .offset(y: 10)
-                    }
-                    .offset(y: -10)
-                )
-                .offset(y: 225)
-                .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
-
-            VStack {
-                HStack {
-                    Image("logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 49)
-                    Text("pawse")
-                        .font(.custom("VictorMono-Regular", size: 30))
-                        .foregroundColor(.black)
-                    Spacer()
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(hex: "F2EDE7"))
-                            .frame(width: 110, height: 49)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-
-                        HStack {
-                            Image("coin")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 51, height: 51)
-                                .offset(x: 5, y: 1)
-
-                            Text("\(coins)")
-                                .font(.custom("Moulpali-Regular", size: 25))
-                                .frame(width: 60, alignment: .center)
-                                .multilineTextAlignment(.center)
-                                .offset(x: -8, y: 0)
-                        }
+        GeometryReader { proxy in
+            ZStack (alignment: .bottom){
+                Color(hex: "EBE3D7").ignoresSafeArea()
+                ScrollView(.vertical){
+                    ZStack{
+                        Image("graycat")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 318, height: 318)
+                            .offset(y: -160)
                         
+                        Text("\(hours)h \(minutes)m")
+                            .font(.custom("Moulpali-Regular", size: 65))
+                            .foregroundColor(.black)
+                            .offset(y: 25)
+                        
+                        Text("hours saved")
+                            .font(.custom("Sarabun-Thin", size: 30))
+                            .foregroundColor(.black)
+                            .offset(y: 70)
+                        
+                        RoundedRectangle(cornerRadius: 20)
+                            .fill(Color(hex: "F2EDE7"))
+                            .frame(width: 380, height: 225)
+                            .overlay(
+                                VStack (spacing: 12) {
+                                    Text("set timer")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                        .foregroundColor(.black)
+                                    
+                                    HStack (spacing: 45) {
+                                        HStack (spacing: 15) {
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .fill(Color.white)
+                                                .frame(width: 80, height: 87)
+                                                .overlay(
+                                                    TextField("", text: $hourText)
+                                                        .keyboardType(.numberPad)
+                                                        .focused($focusedField, equals: .hours)
+                                                        .font(.custom("VictorMono-Regular", size: 40))
+                                                        .multilineTextAlignment(.center)
+                                                        .foregroundColor(.black)
+                                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                                        .onChange(of: hourText) { _ in
+                                                            sanitize(&hourText, maxDigits: 2)
+                                                        }
+                                                        .onSubmit {
+                                                            clampHours()
+                                                        }
+                                                )
+                                            
+                                            Text("hr")
+                                                .font(.custom("VictorMono-Regular", size: 40))
+                                                .foregroundColor(.black)
+                                        }
+                                        
+                                        HStack (spacing: 15) {
+                                            RoundedRectangle(cornerRadius: 20)
+                                                .fill(Color.white)
+                                                .frame(width: 80, height: 87)
+                                                .overlay(
+                                                    TextField("", text: $minuteText)
+                                                        .keyboardType(.numberPad)
+                                                        .focused($focusedField, equals: .minutes)
+                                                        .font(.custom("VictorMono-Regular", size: 40))
+                                                        .multilineTextAlignment(.center)
+                                                        .foregroundColor(.black)
+                                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                                    
+                                                        .onChange(of: minuteText) { _ in
+                                                            sanitize(&minuteText, maxDigits: 2)
+                                                        }
+                                                        .onSubmit {
+                                                            clampMinutes()
+                                                        }
+                                                )
+                                            
+                                            Text("min")
+                                                .font(.custom("VictorMono-Regular", size: 40))
+                                                .foregroundColor(.black)
+                                        }
+                                    }
+                                    .onChange(of: focusedField) { newFocus in
+                                        if newFocus != .hours { clampHours() }
+                                        if newFocus != .minutes { clampMinutes() }
+                                    }
+                                    
+                                    Button(action: {
+                                        clampHours()
+                                        clampMinutes()
+                                        focusedField = nil
+                                        let total = (selectedHours * 3600) + (selectedMinutes * 60)
+                                        sessionLengthSeconds = total
+                                        showSession = true
+                                    }) {
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .fill(Color(hex: "646E61"))
+                                            .frame(width: 235, height: 45)
+                                            .overlay(
+                                                Text("begin session")
+                                                    .font(.custom("Sarabun-Regular", size: 20))
+                                                    .foregroundColor(.white)
+                                            )
+                                    }
+                                    .disabled(!canStartSession)
+                                    .opacity(canStartSession ? 1.0 : 0.5)
+                                    .offset(y: 10)
+                                }
+                                    .offset(y: -10)
+                            )
+                            .offset(y: 225)
+                            .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
+                        
+                        VStack {
+                            HStack {
+                                Image("logo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 49)
+                                Text("pawse")
+                                    .font(.custom("VictorMono-Regular", size: 30))
+                                    .foregroundColor(.black)
+                                Spacer()
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(hex: "F2EDE7"))
+                                        .frame(width: 110, height: 49)
+                                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                                    
+                                    HStack {
+                                        Image("coin")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 51, height: 51)
+                                            .offset(x: 5, y: 1)
+                                        
+                                        Text("\(coins)")
+                                            .font(.custom("Moulpali-Regular", size: 25))
+                                            .frame(width: 60, alignment: .center)
+                                            .multilineTextAlignment(.center)
+                                            .offset(x: -8, y: 0)
+                                    }
+                                    
+                                }
+                                .offset(x: -15, y: 0)
+                            }
+                            .padding(.leading, 15)
+                            
+                            Spacer()
+                        }
                     }
-                    .offset(x: -15, y: 0)
+                    .frame(maxWidth: .infinity, minHeight: proxy.size.height)
+                    .padding(.bottom, 25)
                 }
-                .padding(.leading, 15)
-
-                Spacer()
+                BottomNavBar(selection: $selectedTab) { _ in }
+                    .frame(height: barHeight)
+                    .background(Color(hex: "EBE3D7"))
+                    .ignoresSafeArea(edges: .bottom)
+                    .offset(y: 34)
             }
         }
         .fullScreenCover(isPresented: $showSession) {
@@ -187,8 +201,8 @@ struct HomeView: View {
                 }
             }
         }
-
     }
+    
 
     private func sanitize(_ text: inout String, maxDigits: Int) {
         text = text.filter { $0.isNumber }
@@ -368,7 +382,6 @@ struct SessionView: View {
                 completeSession()
             }
         }
-        
         .onChange(of: scenePhase) { phase in
             if phase == .background {
                 endNow()
@@ -380,6 +393,7 @@ struct SessionView: View {
         } message: {
             Text("You left the app, so the session ended early.")
         }
+        
     }
 
     private func endNow() {
