@@ -271,80 +271,82 @@ struct SessionView: View {
                 }
                 .padding(.leading, 15)
                 Spacer()
-                
-                ZStack(alignment: .topTrailing) {
-                    Image("graycat")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 300)
-                    Image("collecting")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 300)
-                        .offset(x: 70, y: -170)
-                    Text("\(sessionCoins)")
-                        .font(.custom("Moulpali-Regular", size: 40))
-                        .frame(width: 60)
-                        .offset(x: 20, y: -75)
-                        .animation(.easeOut(duration: 0.3), value: coins)
-                }
-                .offset(y: -40)
-                
                 Group {
-                    (
-                        Text("blocking until ")
-                            .font(.custom("Sarabun-Thin", size: 30))
-                            .foregroundColor(.black)
-                      +
-                        Text(endTimeString)
-                            .font(.custom("Sarabun-Regular", size: 30))
-                    )
-                    .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 5)
-
-                    Text(hmsString)
-                        .font(.custom("Moulpali-Regular", size: 65))
-                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                        .offset(y: -30)
-
-                    Text("current session")
-                        .font(.custom("Sarabun-Thin", size: 30))
+                    ZStack(alignment: .topTrailing) {
+                        Image("graycat")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                        Image("collecting")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 300, height: 300)
+                            .offset(x: 70, y: -170)
+                        Text("\(sessionCoins)")
+                            .font(.custom("Moulpali-Regular", size: 40))
+                            .frame(width: 60)
+                            .offset(x: 20, y: -75)
+                            .animation(.easeOut(duration: 0.3), value: coins)
+                    }
+                    .offset(y: -40)
+                    
+                    Group {
+                        (
+                            Text("blocking until ")
+                                .font(.custom("Sarabun-Thin", size: 30))
+                                .foregroundColor(.black)
+                            +
+                            Text(endTimeString)
+                                .font(.custom("Sarabun-Regular", size: 30))
+                        )
                         .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 5)
-                        .offset(y: -75)
-
-                    Button {
-                        if sessionCoins > 0 && remaining > 0 {
-                            showConfirmEnd = true
-                        } else {
+                        
+                        Text(hmsString)
+                            .font(.custom("Moulpali-Regular", size: 65))
+                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                            .offset(y: -30)
+                        
+                        Text("current session")
+                            .font(.custom("Sarabun-Thin", size: 30))
+                            .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: 5)
+                            .offset(y: -75)
+                        
+                        Button {
+                            if sessionCoins > 0 && remaining > 0 {
+                                showConfirmEnd = true
+                            } else {
+                                endNow()
+                            }
+                        } label: {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color(hex: "B14B39"))
+                                .frame(width: 235, height: 49)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                                .overlay(
+                                    Text("end session")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                        .foregroundColor(.white)
+                                )
+                        }
+                        .offset(y: -85)
+                    }
+                    .offset(y: -70)
+                    .alert("End your session early?", isPresented: $showConfirmEnd) {
+                        Button("End now", role: .destructive) {
                             endNow()
                         }
-                    } label: {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color(hex: "B14B39"))
-                            .frame(width: 235, height: 49)
-                            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                            .overlay(
-                                Text("end session")
-                                    .font(.custom("Sarabun-Regular", size: 20))
-                                    .foregroundColor(.white)
-                            )
+                        Button("Keep going", role: .cancel) {}
+                    } message: {
+                        Text("You will lose your coins and current progress if you end early. Are you sure?")
                     }
-                    .offset(y: -85)
+                    
+                    Text("if you end session now, you will lose all\negg hatching progress and rewards")
+                        .multilineTextAlignment(.center)
+                        .font(.custom("Sarabun-Thin", size: 15))
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                        .offset(y: -150)
                 }
-                .offset(y: -70)
-                .alert("End your session early?", isPresented: $showConfirmEnd) {
-                    Button("End now", role: .destructive) {
-                        endNow()
-                    }
-                    Button("Keep going", role: .cancel) {}
-                } message: {
-                    Text("You will lose your coins and current progress if you end early. Are you sure?")
-                }
-
-                Text("if you end session now, you will lose all\negg hatching progress and rewards")
-                    .multilineTextAlignment(.center)
-                    .font(.custom("Sarabun-Thin", size: 15))
-                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                    .offset(y: -150)
+                .offset(y: UIScreen.main.bounds.height * 0.075)
             }
         }
         .onAppear {

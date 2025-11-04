@@ -10,8 +10,23 @@ import SwiftUI
 struct GachaView: View {
 
     var body: some View {
-        Color(hex: "EBE3D7").ignoresSafeArea()
-        
+        ZStack(alignment: .topLeading) {
+            Color(hex: "EBE3D7").ignoresSafeArea()
+
+            VStack {
+                HStack {
+                    Image("logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 49)
+                    Text("pawse")
+                        .font(.custom("VictorMono-Regular", size: 30))
+                        .foregroundColor(.black)
+                    Spacer()
+                }
+                .padding(.leading, 15)
+            }
+        }
     }
 }
 
