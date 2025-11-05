@@ -35,7 +35,7 @@ struct BottomNavBar: View {
                         .stroke(Color.black.opacity(0.1), lineWidth: 1)
                 )
             
-            HStack(spacing: 20){
+            HStack(spacing: 21){
                 ForEach(PawseTab.allCases, id: \.self) { tab in
                     Button {
                         selection = tab
@@ -44,7 +44,7 @@ struct BottomNavBar: View {
                         Image(tab.imageName)
                             .resizable()
                             .scaledToFit()
-                            .frame(height: 55)
+                            .frame(height: 60)
                             .opacity(selection == tab ? 1.0 : 0.75)
                     }
                 }
