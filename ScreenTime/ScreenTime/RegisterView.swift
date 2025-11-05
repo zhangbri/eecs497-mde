@@ -20,7 +20,7 @@ struct RegisterView: View {
                     Text(" pawse").font(.custom("Moulpali-Regular", size: 64))
                 }
                 .padding(.top, UIScreen.main.bounds.height * 0.075)
-
+                
                 Rectangle()
                     .fill(Color.white)
                     .frame(width: 320, height: 332)
@@ -34,19 +34,19 @@ struct RegisterView: View {
                                 .frame(width: 272, height: 40, alignment: .leading)
                                 .background(Color.white)
                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
-
+                            
                             Text("Password")
                                 .font(.custom("Moulpali-Regular", size: 16))
                                 .foregroundColor(.black)
                                 .padding(.top, 12)
-
+                            
                             TextField("Password", text: .constant(""))
                                 .font(.custom("Moulpali-Regular", size: 16))
                                 .padding(.leading, 16)
                                 .frame(width: 272, height: 40, alignment: .leading)
                                 .background(Color.white)
                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
-
+                            
                             Button(action: { print("Register tapped") }) {
                                 Text("Register")
                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -57,8 +57,9 @@ struct RegisterView: View {
                                     .cornerRadius(6)
                                     .padding(.top, 17)
                             }
-
+                            
                             Button(action: {
+                                onTapAlreadyHaveAccount()
                                 dismiss()
                             }) {
                                 Text("Already have an account?")
@@ -68,21 +69,18 @@ struct RegisterView: View {
                                     .padding(.top, 9)
                             }
                         }
-                        .padding(.top, 17.5)
-                        .padding(.leading, 23.5),
+                            .padding(.top, 17.5)
+                            .padding(.leading, 23.5),
                         alignment: .topLeading
                     )
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
                     .frame(maxWidth: .infinity)
             }
         }
-        .navigationBarBackButtonHidden(true)
     }
 }
 
 
 #Preview {
-    NavigationStack {
-        RegisterView()
-    }
+    RegisterView()
 }

@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct ScreenTimeApp: App {
+    @StateObject private var router = TabRouter()
     var body: some Scene {
         WindowGroup {
-            AuthRootView() // no NavigationStack needed for this toggle
+            AuthRootView()
+                .environmentObject(router)
         }
     }
 }
+

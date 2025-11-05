@@ -12,6 +12,7 @@ private enum InventoryTab: String, CaseIterable {
 }
 
 struct InventoryView: View {
+    @EnvironmentObject private var router: TabRouter
     @AppStorage("coins") private var coins: Int = 0
     @State private var selectedTab: PawseTab = .inventory
     @State private var invTab: InventoryTab = .sprites
@@ -113,7 +114,7 @@ struct InventoryView: View {
                     }
 
                 }
-                BottomNavBar(selection: $selectedTab) { _ in }
+                BottomNavBar(selection: $router.tab) { _ in }
                     .frame(height: barHeight)
                     .ignoresSafeArea(edges: .bottom)
                     .offset(y: 34)

@@ -9,6 +9,7 @@ import SwiftUI
 import Combine
 
 struct HomeView: View {
+    @EnvironmentObject private var router: TabRouter
     @State private var selectedTab: PawseTab = .home
     private let barHeight: CGFloat = 78
     @AppStorage("coins") private var coins: Int = 0
@@ -186,7 +187,7 @@ struct HomeView: View {
                     .frame(maxWidth: .infinity, minHeight: proxy.size.height)
                     .padding(.bottom, 25)
                 }
-                BottomNavBar(selection: $selectedTab) { _ in }
+                BottomNavBar(selection: $router.tab) { _ in }
                     .frame(height: barHeight)
                     .background(Color(hex: "EBE3D7"))
                     .ignoresSafeArea(edges: .bottom)

@@ -10,6 +10,7 @@ import SwiftUI
 enum AuthScreen { case login, register, home }
 
 struct AuthRootView: View {
+    @EnvironmentObject private var router: TabRouter
     @State private var screen: AuthScreen = .login
 
     var body: some View {
@@ -23,9 +24,16 @@ struct AuthRootView: View {
             case .register:
                 RegisterView(onTapAlreadyHaveAccount: { screen = .login })
             case .home:
-                HomeView()
+                switch router.tab {
+                case .home:        HomeView()
+                case .inventory:   InventoryView()
+                case .shop:        Text("Shop coming soon!")
+                case .leaderboard: Text("Leaderboard coming soon!")
+                case .profile:     Text("Profile coming soon!")
+                }
             }
         }
         .animation(.easeInOut, value: screen)
+        .animation(.easeInOut, value: router.tab)
     }
 }
