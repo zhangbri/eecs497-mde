@@ -11,8 +11,9 @@
 		<string>Sarabun-Thin.ttf</string>
 		<string>VictorMono-Regular.ttf</string>
 		<string>Sarabun-Thin.ttf</string>
-		<string>Sarabun-ExtraLight.tff</string>
-		<string>Sarabun-Medium.tff</string>
+		<string>Sarabun-ExtraLight.ttf</string>
+		<string>Sarabun-Medium.ttf</string>
+		<string>Sarabun-Bold.ttf</string>
 	</array>
 </dict>
 </plist>

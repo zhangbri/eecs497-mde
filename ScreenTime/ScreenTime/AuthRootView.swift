@@ -29,7 +29,7 @@ struct AuthRootView: View {
                 case .inventory:   InventoryView()
                 case .shop:        Text("Shop coming soon!")
                 case .leaderboard: Text("Leaderboard coming soon!")
-                case .profile:     Text("Profile coming soon!")
+                case .profile:     ProfileView()
                 }
             }
         }
