@@ -43,8 +43,7 @@ struct GachaView: View {
                                             Text("\(coins)")
                                                 .font(.custom("Moulpali-Regular", size: 25))
                                                 .frame(width: 60, alignment: .center)
-                                                .multilineTextAlignment(.center)
-                                                .offset(x: -8)
+                                                 .offset(x: -8)
                                         }
                                     }
                                     .offset(x: -15, y: 0)
@@ -53,8 +52,6 @@ struct GachaView: View {
                                 Spacer()
                             }
                         }
-                        .frame(maxWidth: .infinity, minHeight: proxy.size.height)
-                        .padding(.bottom, 25)
                     }
                     BottomNavBar(selection: $selectedTab) { _ in }
                         .frame(height: barHeight)
