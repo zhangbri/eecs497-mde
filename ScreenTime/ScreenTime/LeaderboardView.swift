@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct LeaderboardView: View {
+    @EnvironmentObject private var router: TabRouter
     @AppStorage("coins") private var coins: Int = 0
-        @State private var selectedTab: PawseTab = .inventory
         private let barHeight: CGFloat = 78
 
         var body: some View {
@@ -232,7 +232,7 @@ struct LeaderboardView: View {
                             }
                         }
                     }
-                    BottomNavBar(selection: $selectedTab) { _ in }
+                    BottomNavBar(selection: $router.tab) { _ in }
                         .frame(height: barHeight)
                         .background(Color(hex: "EBE3D7"))
                         .ignoresSafeArea(edges: .bottom)
@@ -243,5 +243,5 @@ struct LeaderboardView: View {
 }
 
 #Preview {
-    LeaderboardView()
+    LeaderboardView().environmentObject(TabRouter())
 }

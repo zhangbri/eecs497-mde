@@ -10,7 +10,6 @@ import Combine
 
 struct HomeView: View {
     @EnvironmentObject private var router: TabRouter
-    @State private var selectedTab: PawseTab = .home
     private let barHeight: CGFloat = 78
     @AppStorage("coins") private var coins: Int = 0
     @State private var elapsedSeconds = 0
@@ -303,7 +302,7 @@ struct SessionView: View {
                             .offset(x: 20, y: -75)
                             .animation(.easeOut(duration: 0.3), value: coins)
                     }
-                    .offset(y: -40)
+                    .offset(y: -45)
                     
                     Group {
                         (
@@ -361,7 +360,6 @@ struct SessionView: View {
                         .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                         .offset(y: -150)
                 }
-                .offset(y: UIScreen.main.bounds.height * 0.075)
             }
         }
         .onAppear {
@@ -409,5 +407,5 @@ struct SessionView: View {
 }
 
 #Preview {
-    HomeView()
+    HomeView().environmentObject(TabRouter())
 }

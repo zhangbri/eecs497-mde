@@ -153,5 +153,5 @@ private func achievementCard<Content: View>(@ViewBuilder content: () -> Content)
 }
 
 #Preview {
-    ProfileView()
+    ProfileView().environmentObject(TabRouter())
 }

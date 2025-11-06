@@ -27,8 +27,8 @@ struct AuthRootView: View {
                 switch router.tab {
                 case .home:        HomeView()
                 case .inventory:   InventoryView()
-                case .shop:        Text("Shop coming soon!")
-                case .leaderboard: Text("Leaderboard coming soon!")
+                case .shop:        GachaView()
+                case .leaderboard: LeaderboardView()
                 case .profile:     ProfileView()
                 }
             }

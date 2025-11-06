@@ -14,7 +14,6 @@ private enum InventoryTab: String, CaseIterable {
 struct InventoryView: View {
     @EnvironmentObject private var router: TabRouter
     @AppStorage("coins") private var coins: Int = 0
-    @State private var selectedTab: PawseTab = .inventory
     @State private var invTab: InventoryTab = .sprites
     private let gridCols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
 
@@ -174,5 +173,5 @@ struct InventoryView: View {
 
 }
 #Preview {
-    InventoryView()
+    InventoryView().environmentObject(TabRouter())
 }
