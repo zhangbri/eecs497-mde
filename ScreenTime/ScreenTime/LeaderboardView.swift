@@ -241,9 +241,10 @@ struct LeaderboardView: View {
                                             .font(.custom("Moulpali-Regular", size: 16))
                                             .foregroundColor(.black)
                                     }
-                                    .offset(y: 45)
+                                    .offset(y: 20)
                                 }
-
+                                
+                                Spacer().frame(height: 90)
                             }
                         }
                     }
