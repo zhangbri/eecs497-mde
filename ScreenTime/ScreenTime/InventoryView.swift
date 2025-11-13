@@ -94,7 +94,7 @@ struct InventoryView: View {
                                                             topLeading: 20,
                                                             bottomLeading: 0,
                                                             bottomTrailing: 0,
-                                                            topTrailing: 20,
+                                                            topTrailing: 20
                                                         ))
                                                     )
                                                     .shadow(color: .black.opacity(0.25), radius: 6, x: 0, y: -2)
