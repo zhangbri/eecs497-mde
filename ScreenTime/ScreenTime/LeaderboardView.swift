@@ -11,6 +11,20 @@ struct LeaderboardView: View {
     @EnvironmentObject private var router: TabRouter
     @AppStorage("coins") private var coins: Int = 0
         private let barHeight: CGFloat = 78
+    
+    private var currentWeekRange: String {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
+
+        let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+
+        return "\(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
+    }
 
         var body: some View {
             GeometryReader { proxy in
@@ -75,9 +89,10 @@ struct LeaderboardView: View {
                                     alignment: .leading
                                 )
                                 .offset(y: -35)
-                                Text("Week of: 9/28-10/4")
+                                Text("Week of: \(currentWeekRange)")
                                     .font(.custom("Moulpali-Regular", size: 24))
                                     .offset(y: -60)
+
                                 
                                 HStack(alignment: .bottom, spacing: 15) {
                                     RoundedRectangle(cornerRadius: 10)
