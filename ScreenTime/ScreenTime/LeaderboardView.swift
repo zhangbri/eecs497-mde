@@ -11,6 +11,7 @@ struct LeaderboardView: View {
     @EnvironmentObject private var router: TabRouter
     @AppStorage("coins") private var coins: Int = 0
     @State private var showingShareSheet = false
+    @State private var showingFriends = false
     private let barHeight: CGFloat = 78
     
     private var currentWeekRange: String {
@@ -18,15 +19,15 @@ struct LeaderboardView: View {
         let now = Date()
         
         let startOfWeek = calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now))!
-
+        
         let endOfWeek = calendar.date(byAdding: .day, value: 6, to: startOfWeek)!
-
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "M/d"
-
+        
         return "\(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
     }
-
+    
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -71,7 +72,7 @@ struct LeaderboardView: View {
                             .overlay(
                                 HStack {
                                     Button(action: {
-                                        print("Back arrow tapped")
+                                        showingFriends = true
                                     }) {
                                         Image("leftarrow")
                                             .resizable()
@@ -79,21 +80,21 @@ struct LeaderboardView: View {
                                             .frame(width: 48, height: 48)
                                     }
                                     .padding(.leading, -5)
-
+                                    
                                     Image("friends")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 48, height: 48)
                                         .offset(x:-20)
                                 }
-                                .padding(.leading, 0),
+                                    .padding(.leading, 0),
                                 alignment: .leading
                             )
                             .offset(y: -35)
                             Text("Week of: \(currentWeekRange)")
                                 .font(.custom("Moulpali-Regular", size: 24))
                                 .offset(y: -60)
-
+                            
                             
                             HStack(alignment: .bottom, spacing: 15) {
                                 RoundedRectangle(cornerRadius: 10)
@@ -122,7 +123,7 @@ struct LeaderboardView: View {
                                                 .offset(y:-25)
                                         }
                                     )
-
+                                
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(hex: "F2EDE7"))
                                     .frame(width: 155, height: 200)
@@ -149,7 +150,7 @@ struct LeaderboardView: View {
                                                 .offset(y:-25)
                                         }
                                     )
-
+                                
                                 RoundedRectangle(cornerRadius: 10)
                                     .fill(Color(hex: "F2EDE7"))
                                     .frame(width: 110, height: 150)
@@ -202,7 +203,7 @@ struct LeaderboardView: View {
                                     }
                                 )
                                 .offset(y: -35)
-
+                            
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color(hex: "F2EDE7"))
                                 .frame(width: 368, height: 73)
@@ -260,6 +261,10 @@ struct LeaderboardView: View {
                     .ignoresSafeArea(edges: .bottom)
                     .offset(y: 34)
             }
+            .fullScreenCover(isPresented: $showingFriends) {
+                FriendsView()
+                    .environmentObject(router)
+            }
         }
     }
 }
@@ -286,3 +291,4 @@ struct ShareSheet: UIViewControllerRepresentable {
 #Preview {
     LeaderboardView().environmentObject(TabRouter())
 }
+
