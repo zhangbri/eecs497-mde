@@ -9,9 +9,11 @@ import SwiftUI
 
 struct GachaView: View {
     @EnvironmentObject private var router: TabRouter
-    @AppStorage("coins") private var coins: Int = 0
-        private let barHeight: CGFloat = 78
-
+    //@AppStorage("coins") private var coins: Int = 0
+    private let barHeight: CGFloat = 78
+    
+    @State private var coins: Int = 1000
+    @State private var showResult = false
         var body: some View {
             GeometryReader { proxy in
                 ZStack(alignment: .bottom) {
@@ -87,7 +89,7 @@ struct GachaView: View {
                                                         .offset(x:-5,y:-3)
 
                                                         ZStack{
-                                                            Button(action: {}) {
+                                                            Button(action: { spendCoins(50) }) {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -114,7 +116,7 @@ struct GachaView: View {
                                                         .offset(x:4, y:-9)
 
                                                         ZStack{
-                                                            Button(action: {}) {
+                                                            Button(action: { spendCoins(500) })  {
                                                                 Text("10x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -179,7 +181,7 @@ struct GachaView: View {
                                                         .offset(x:-5, y: -3)
 
                                                         ZStack{
-                                                            Button(action: {}) {
+                                                            Button(action: { spendCoins(30) })  {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -197,7 +199,7 @@ struct GachaView: View {
                                                                     .scaledToFit()
                                                                     .frame(width: 47, height: 47)
                                                                     .offset(x:79)
-                                                                Text("300")
+                                                                Text("30")
                                                                     .font(.custom("Moulpali-Regular", size: 25))
                                                                     .offset(x:71)
                                                                     .foregroundColor(.black)
@@ -206,7 +208,7 @@ struct GachaView: View {
                                                         .offset(y:-9)
 
                                                         ZStack{
-                                                            Button(action: {}) {
+                                                            Button(action: { spendCoins(300) })  {
                                                                 Text("10x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -224,7 +226,7 @@ struct GachaView: View {
                                                                     .scaledToFit()
                                                                     .frame(width: 47, height: 47)
                                                                     .offset(x:85)
-                                                                Text("3000")
+                                                                Text("300")
                                                                     .font(.custom("Moulpali-Regular", size: 25))
                                                                     .offset(x:77)
                                                                     .foregroundColor(.black)
@@ -271,7 +273,11 @@ struct GachaView: View {
                                                         .offset(x:-5, y: -3)
 
                                                         ZStack{
-                                                            Button(action: {}) {
+                                                            Button(action:{
+                                                                spendCoins(60)
+                                                                showResult = true
+                                                            })
+                                                            {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -289,7 +295,7 @@ struct GachaView: View {
                                                                     .scaledToFit()
                                                                     .frame(width: 47, height: 47)
                                                                     .offset(x:80)
-                                                                Text("600")
+                                                                Text("60")
                                                                     .font(.custom("Moulpali-Regular", size: 25))
                                                                     .offset(x:71)
                                                                     .foregroundColor(.black)
@@ -298,7 +304,7 @@ struct GachaView: View {
                                                         .offset( y:-9)
 
                                                         ZStack{
-                                                            Button(action: {}) {
+                                                            Button(action: { spendCoins(600) })  {
                                                                 Text("10x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -316,7 +322,7 @@ struct GachaView: View {
                                                                     .scaledToFit()
                                                                     .frame(width: 47, height: 47)
                                                                     .offset(x:80)
-                                                                Text("6000")
+                                                                Text("600")
                                                                     .font(.custom("Moulpali-Regular", size: 25))
                                                                     .offset(x:71)
                                                                     .foregroundColor(.black)
@@ -341,10 +347,121 @@ struct GachaView: View {
                         .ignoresSafeArea(edges: .bottom)
                         .offset(y: 34)
                 }
+                .fullScreenCover(isPresented: $showResult) {
+                    GachaResultView()
+                }
             }
+        }
+        private func spendCoins(_ cost: Int) {
+            guard coins >= cost else {
+                return
+            }
+            coins -= cost
         }
 }
 
+struct GachaResultView: View {
+    @Environment(\.dismiss) private var dismiss
+    var body: some View {
+        ZStack {
+            Color(hex: "EBE3D7").ignoresSafeArea()
+            
+            VStack {
+                HStack {
+                    Image("logo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(height: 49)
+                    Text("pawse")
+                        .font(.custom("VictorMono-Regular", size: 30))
+                        .foregroundColor(.black)
+                    Spacer()
+                    
+                    Button {
+                        dismiss()
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .stroke(Color.black, lineWidth: 4)
+                                .frame(width: 40, height: 40)
+                            Image(systemName: "xmark")
+                                .foregroundColor(.black)
+                                .font(.system(size:25, weight: .bold))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+                
+                Spacer()
+                
+                Image("orangetabby")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 318, height: 318)
+                    .offset(y: -15)
+                
+                VStack {
+                    Text("you unlocked")
+                        .font(.custom("Sarabun-Regular", size: 30))
+                        .foregroundColor(.black)
+                        .offset(y: -30)
+                    
+                    Text("RARE")
+                        .font(.custom("VictorMono-Regular", size: 40))
+                        .foregroundColor(Color(hex: "E62222"))
+                        .shadow(color: Color(hex: "E62222"), radius: 4, x: 0, y: 1)
+                        .offset(y: -30)
+                    
+                    Text("Orange Tabby")
+                        .font(.custom("Sarabun-Regular", size: 50))
+                        .foregroundColor(.black)
+                        .offset(y: -42.5)
+                    }
+                
+                VStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Equip Now")
+                            .font(.custom("Moulpali-Regular", size: 30))
+                            .foregroundColor(.black)
+                            .frame(width: 245, height: 53)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(hex: "B2E5AB"))
+                                    .shadow(color: .black.opacity(0.25),
+                                            radius: 4,
+                                            x: 0,
+                                            y: 2)
+                            )
+                    }
+                    
+                    Button {
+                        dismiss()
+                    } label: {
+                        Text("Roll again")
+                            .font(.custom("Moulpali-Regular", size: 15))
+                            .foregroundColor(.black)
+                            .frame(width: 164, height: 44)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(hex: "F273E9"))
+                                    .shadow(color: .black.opacity(0.25),
+                                            radius: 4,
+                                            x: 0,
+                                            y: 2)
+                            )
+                    }
+                    .offset(y: 10)
+                }
+                .offset(y: -45)
+                
+                Spacer()
+            }
+        }
+    }
+}
 
 #Preview {
     GachaView().environmentObject(TabRouter())

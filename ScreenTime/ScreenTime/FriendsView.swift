@@ -227,15 +227,15 @@ struct AddFriendsPopup: View {
                             ZStack {
                                 Circle()
                                     .stroke(Color.black, lineWidth: 4)
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 33, height: 33)
                                 Image(systemName: "xmark")
-                                    .font(.system(size: 16, weight: .bold))
+                                    .font(.system(size: 20, weight: .bold))
                                     .foregroundColor(.black)
                             }
                         }
                     }
                 }
-                .offset(x: -48, y: -315)
+                .offset(x: -48, y: -314)
                 
                 VStack {
                     Text("Add Friends")
