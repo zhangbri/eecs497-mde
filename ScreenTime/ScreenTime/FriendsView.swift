@@ -235,7 +235,7 @@ struct AddFriendsPopup: View {
                         }
                     }
                 }
-                .offset(x: -45, y: -285)
+                .offset(x: -48, y: -315)
                 
                 VStack {
                     Text("Add Friends")
@@ -263,7 +263,7 @@ struct AddFriendsPopup: View {
                     Text("Friend Requests")
                         .font(.custom("Moulpali-Regular", size: 30))
                         .foregroundColor(.black)
-                        .padding(.bottom, 200)
+                        .padding(.bottom, 225)
                     
                     RoundedRectangle(cornerRadius: 10)
                         .fill(Color(hex: "F2EDE7"))
@@ -302,7 +302,7 @@ struct AddFriendsPopup: View {
                                 }
                             }
                         )
-                        .padding(.top, -215)
+                        .padding(.top, -245)
                 }
             }
         }
