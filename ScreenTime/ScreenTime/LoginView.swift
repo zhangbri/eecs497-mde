@@ -6,10 +6,15 @@
 //
 
 import SwiftUI
+import Supabase
 
 struct LoginView: View {
     var onTapCreateAccount: () -> Void = {}
     var onSignInSuccess: () -> Void = {}
+    @State private var email: String = ""
+    @State private var password: String = ""
+    @State private var errorMessage: String?
+    @State private var isLoading = false
     var body: some View {
         NavigationStack {
             ZStack(alignment: .topLeading) {
@@ -28,7 +33,7 @@ struct LoginView: View {
                         .overlay(
                             VStack(alignment: .leading, spacing: 5) {
                                 Text("Email").font(.custom("Moulpali-Regular", size: 16)).foregroundColor(.black)
-                                TextField("Email", text: .constant(""))
+                                TextField("Email", text: $email)
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .padding(.leading, 16)
                                     .frame(width: 272, height: 40, alignment: .leading)
@@ -40,24 +45,35 @@ struct LoginView: View {
                                     .foregroundColor(.black)
                                     .padding(.top, 12)
                                 
-                                TextField("Password", text: .constant(""))
+                                TextField("Password", text: $password)
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .padding(.leading, 16)
                                     .frame(width: 272, height: 40, alignment: .leading)
                                     .background(Color.white)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
                                 
-                                Button(action: { print("Sign In tapped")
-                                    onSignInSuccess()
+                                Button(action: {
+                                    Task { await signIn() }
                                 }) {
-                                    Text("Sign In")
+                                    Text(isLoading ? "Signing in..." : "Sign In")
                                         .font(.custom("Moulpali-Regular", size: 16))
                                         .foregroundColor(.black)
                                         .frame(width: 272, height: 40)
                                         .background(Color(hex: "EBE3D7"))
-                                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.black, lineWidth: 1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 6)
+                                                .stroke(Color.black, lineWidth: 1)
+                                        )
                                         .cornerRadius(6)
                                         .padding(.top, 17)
+                                }
+                                .disabled(isLoading)
+
+                                if let errorMessage = errorMessage {
+                                    Text(errorMessage)
+                                        .font(.custom("Moulpali-Regular", size: 8))
+                                        .foregroundColor(.red)
+                                        .padding(.top, 4)
                                 }
                                 NavigationLink(destination: ForgotPasswordView()) {
                                     Text("Forgot password?")
@@ -83,6 +99,48 @@ struct LoginView: View {
                         .frame(maxWidth: .infinity)
                 }
             }
+        }
+    }
+
+    private struct UserRow: Decodable {
+        let id: Int
+        let email: String
+        let password: String
+    }
+
+    private func signIn() async {
+        guard !email.isEmpty, !password.isEmpty else {
+            errorMessage = "Please enter email and password."
+            return
+        }
+
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+
+        let client = SupabaseManager.shared.client
+
+        do {
+            let users: [UserRow] = try await client
+                .from("users")
+                .select("id,email,password")
+                .eq("email", value: email)
+                .eq("password", value: password)
+                .limit(1)
+                .execute()
+                .value
+
+            if users.isEmpty {
+                errorMessage = "User or password incorrect."
+                return
+            }
+
+            errorMessage = nil
+            onSignInSuccess()
+
+        } catch {
+            print("Login error:", error)
+            errorMessage = "An error occurred while signing in."
         }
     }
 }
