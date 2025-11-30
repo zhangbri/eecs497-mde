@@ -26,6 +26,7 @@ struct ForgotPasswordView: View {
 struct ForgotPasswordForm: View {
     @Binding var email: String
     @Binding var didSendEmail: Bool
+    @State private var errorMessage: String?
     
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -53,10 +54,17 @@ struct ForgotPasswordForm: View {
                                 .frame(width: 272, height: 40, alignment: .leading)
                                 .background(Color.white)
                                 .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled(true)
                             
                             Button(action: {
-                                print("Reset link sent")
-                                didSendEmail = true
+                                if !isValidEmail(email) {
+                                        errorMessage = "Please enter a valid email address."
+                                        return
+                                    }
+                                    
+                                    errorMessage = nil
+                                    didSendEmail = true
                             }) {
                                 Text("Send Reset Link")
                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -67,6 +75,14 @@ struct ForgotPasswordForm: View {
                                     .cornerRadius(6)
                                     .padding(.top, 10)
                             }
+                            ZStack(alignment: .topLeading) {
+                                if let errorMessage = errorMessage {
+                                    Text(errorMessage)
+                                        .font(.custom("Moulpali-Regular", size: 12))
+                                        .foregroundColor(.red)
+                                }
+                            }
+                            .offset(y: -10)
                         }
                             .padding(.top, 25)
                             .padding(.leading, 23.5),
@@ -74,8 +90,13 @@ struct ForgotPasswordForm: View {
                     )
                     .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
                     .frame(maxWidth: .infinity)
+                
             }
         }
+    }
+    private func isValidEmail(_ email: String) -> Bool {
+        guard !email.isEmpty else { return false }
+        return email.contains("@") && email.contains(".")
     }
 }
 

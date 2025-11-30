@@ -15,6 +15,8 @@ struct LoginView: View {
     @State private var password: String = ""
     @State private var errorMessage: String?
     @State private var isLoading = false
+    @State private var showPassword = false
+
     var body: some View {
         NavigationStack {
             ZStack(alignment: .topLeading) {
@@ -39,18 +41,41 @@ struct LoginView: View {
                                     .frame(width: 272, height: 40, alignment: .leading)
                                     .background(Color.white)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled(true)
                                 
                                 Text("Password")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .foregroundColor(.black)
                                     .padding(.top, 12)
                                 
-                                TextField("Password", text: $password)
+                                ZStack(alignment: .trailing) {
+                                    Group {
+                                        if showPassword {
+                                            TextField("Password", text: $password)
+                                        } else {
+                                            if password.isEmpty {
+                                                SecureField("Password", text: $password)
+                                            } else {
+                                                SecureField("", text: $password)
+                                                    .offset(y: 7)
+                                            }
+                                        }
+                                    }
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled(true)
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .padding(.leading, 16)
                                     .frame(width: 272, height: 40, alignment: .leading)
                                     .background(Color.white)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+
+                                    Button(action: { showPassword.toggle() }) {
+                                        Image(systemName: showPassword ? "eye.slash" : "eye")
+                                            .foregroundColor(.gray)
+                                            .padding(.trailing, 12)
+                                    }
+                                }
                                 
                                 Button(action: {
                                     Task { await signIn() }
@@ -69,12 +94,16 @@ struct LoginView: View {
                                 }
                                 .disabled(isLoading)
 
-                                if let errorMessage = errorMessage {
-                                    Text(errorMessage)
-                                        .font(.custom("Moulpali-Regular", size: 8))
-                                        .foregroundColor(.red)
-                                        .padding(.top, 4)
+                                ZStack(alignment: .topLeading) {
+                                    if let errorMessage = errorMessage {
+                                        Text(errorMessage)
+                                            .font(.custom("Moulpali-Regular", size: 12))
+                                            .foregroundColor(.red)
+                                    }
                                 }
+                                .frame(height: 0)
+                                .offset(y: 7.5)
+                                
                                 NavigationLink(destination: ForgotPasswordView()) {
                                     Text("Forgot password?")
                                         .font(.custom("Moulpali-Regular", size: 16))
@@ -131,7 +160,7 @@ struct LoginView: View {
                 .value
 
             if users.isEmpty {
-                errorMessage = "User or password incorrect."
+                errorMessage = "Incorrect email or password."
                 return
             }
 
@@ -140,7 +169,7 @@ struct LoginView: View {
 
         } catch {
             print("Login error:", error)
-            errorMessage = "An error occurred while signing in."
+            errorMessage = "Incorrect email or password."
         }
     }
 }

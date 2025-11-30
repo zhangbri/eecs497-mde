@@ -15,6 +15,7 @@ struct RegisterView: View {
     @State private var password: String = ""
     @State private var errorMessage: String?
     @State private var isLoading = false
+    @State private var showPassword = false
 
     var body: some View {
         NavigationStack {
@@ -40,19 +41,40 @@ struct RegisterView: View {
                                     .frame(width: 272, height: 40, alignment: .leading)
                                     .background(Color.white)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled(true)
                                 
                                 Text("Password")
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .foregroundColor(.black)
                                     .padding(.top, 12)
                                 
-                                TextField("Password", text: $password)
+                                ZStack(alignment: .trailing) {
+                                    Group {
+                                        if showPassword {
+                                            TextField("Password", text: $password)
+                                        } else {
+                                            if password.isEmpty {
+                                                SecureField("Password", text: $password)
+                                            } else {
+                                                SecureField("", text: $password)
+                                                    .offset(y: 7)
+                                            }
+                                        }
+                                    }
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .padding(.leading, 16)
                                     .frame(width: 272, height: 40, alignment: .leading)
                                     .background(Color.white)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
-                                
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled(true)
+                                    Button(action: { showPassword.toggle() }) {
+                                        Image(systemName: showPassword ? "eye.slash" : "eye")
+                                            .foregroundColor(.gray)
+                                            .padding(.trailing, 12)
+                                    }
+                                }
                                 Button(action: {
                                     Task { await register() }
                                 }) {
@@ -69,12 +91,16 @@ struct RegisterView: View {
                                         .padding(.top, 17)
                                 }
                                 .disabled(isLoading)
-                                if let errorMessage = errorMessage {
-                                    Text(errorMessage)
-                                        .foregroundColor(.red)
-                                        .font(.custom("Moulpali-Regular", size: 8))
-                                        .padding(.top, 5)
+                                
+                                ZStack(alignment: .topLeading) {
+                                    if let errorMessage = errorMessage {
+                                        Text(errorMessage)
+                                            .foregroundColor(.red)
+                                            .font(.custom("Moulpali-Regular", size: 12))
+                                    }
                                 }
+                                .offset(y: 7.5)
+                                .frame(height: 0)
                                 NavigationLink(destination: LoginView()) {
                                     Text("Already have an account?")
                                         .font(.custom("Moulpali-Regular", size: 16))
@@ -110,7 +136,7 @@ struct RegisterView: View {
     
     private func register() async {
         guard !email.isEmpty, !password.isEmpty else {
-            errorMessage = "Please fill out all fields."
+            errorMessage = "Please enter email and password."
             return
         }
 
@@ -160,7 +186,7 @@ struct RegisterView: View {
 
         } catch {
             print("Register error:", error)
-            errorMessage = error.localizedDescription
+            errorMessage = "Incorrect email or password."
         }
     }
 }
