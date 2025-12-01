@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct ProfileView: View {
     @EnvironmentObject private var router: TabRouter
@@ -16,7 +17,10 @@ struct ProfileView: View {
     @AppStorage("profile_name") private var name: String = ""
     @AppStorage("profile_username") private var username: String = ""
     @AppStorage("profile_pronouns") private var pronouns: String = ""
-
+    @AppStorage("profile_image_data") private var profileImageData: Data = Data()
+    @State private var profileImage: UIImage?
+    @State private var selectedItem: PhotosPickerItem?
+    
     @State private var totalCompletedSessions: Int = 0
     @State private var Averagesessiontime: Int = 0
     @State private var Longestsession: Int = 0
@@ -60,16 +64,32 @@ struct ProfileView: View {
                             Text("Profile")
                                 .font(.custom("Moulpali-Regular", size: 48))
                                 .offset(y: -70)
-                            Image(systemName: "person.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 205, height: 205)
-                                .foregroundColor(Color(hex: "FFFFFF"))
-                                .padding(.top, -170)
-                            Text("edit profile picture")
-                                .font(.custom("Sarabun-Light", size: 16))
-                                .padding(.top, 4)
-                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                            Group {
+                                if let profileImage {
+                                    Image(uiImage: profileImage)
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 205, height: 205)
+                                        .clipShape(Circle())
+                                } else {
+                                    Image(systemName: "person.circle.fill")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 205, height: 205)
+                                        .foregroundColor(Color(hex: "FFFFFF"))
+                                }
+                            }
+                            .padding(.top, -170)
+                            
+                            PhotosPicker(selection: $selectedItem, matching: .images) {
+                                Text("edit profile picture")
+                                    .font(.custom("Sarabun-Light", size: 16))
+                                    .foregroundColor(.black)
+                                    .padding(.top, 4)
+                                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                            }
+                            .buttonStyle(.plain) 
+                            
                             VStack() {
                                 Rectangle()
                                     .fill(Color(hex: "C9BEAE"))
@@ -191,6 +211,24 @@ struct ProfileView: View {
                         .background(Color(hex: "EBE3D7"))
                         .ignoresSafeArea(edges: .bottom)
                         .offset(y: 34)
+            }
+        }
+        .onAppear {
+            if !profileImageData.isEmpty {
+                profileImage = UIImage(data: profileImageData)
+            }
+        }
+
+        .onChange(of: selectedItem) { newItem in
+            guard let newItem else { return }
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    await MainActor.run {
+                        profileImageData = data
+                        profileImage = uiImage
+                    }
+                }
             }
         }
     }
