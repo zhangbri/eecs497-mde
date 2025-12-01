@@ -13,9 +13,13 @@ struct ProfileView: View {
     @AppStorage("coins") private var coins: Int = 0
     private let barHeight: CGFloat = 78
 
-    @State private var name: String = ""
-    @State private var username: String = ""
-    @State private var pronouns: String = ""
+    @AppStorage("profile_name") private var name: String = ""
+    @AppStorage("profile_username") private var username: String = ""
+    @AppStorage("profile_pronouns") private var pronouns: String = ""
+
+    @State private var totalCompletedSessions: Int = 0
+    @State private var Averagesessiontime: Int = 0
+    @State private var Longestsession: Int = 0
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -89,6 +93,7 @@ struct ProfileView: View {
                                     TextField("Username", text: $username)
                                         .font(.custom("Sarabun-Regular", size: 20))
                                         .padding(.leading, 9.5)
+                                        .textInputAutocapitalization(.never)
                                 }
                                 .padding(.horizontal, 25)
                                 .frame(height: 40)
@@ -128,11 +133,58 @@ struct ProfileView: View {
                                 .padding(.horizontal, 5)
                             }
                             .offset(y: -155)
-                            Spacer()
+                            
+                            Text("Statistics")
+                                .font(.custom("Moulpali-Regular", size: 48))
+                                .offset(y: -215)
+                            VStack() {
+                                Rectangle()
+                                    .fill(Color(hex: "C9BEAE"))
+                                    .frame(height: 1.5)
+                                HStack {
+                                    Text("Total completed sessions").font(.custom("Sarabun-Bold", size: 20))
+                                        .padding(.leading, -65)
+
+                                    Text("\(totalCompletedSessions) sessions")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                        .offset(x: 40)
+                                        
+                                }
+                                .frame(height: 30)
+                                
+
+                                Rectangle()
+                                    .fill(Color(hex: "C9BEAE"))
+                                    .frame(height: 1.5)
+                                HStack {
+                                    Text("Average session time").font(.custom("Sarabun-Bold", size: 20))
+                                        .padding(.leading, -102.5)
+                                    Text("\(Averagesessiontime) minutes")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                        .offset(x: 77)
+                                       
+                                }
+                                .frame(height: 30)
+                                
+                                Rectangle()
+                                    .fill(Color(hex: "C9BEAE"))
+                                    .frame(height: 1.5)
+                                HStack {
+                                    Text("Longest Session").font(.custom("Sarabun-Bold", size: 20))
+                                        .padding(.leading, -148)
+                                    Text("\(Longestsession) sessions")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                        .offset(x: 121)
+                                }
+                                .frame(height: 30)
+                                Rectangle()
+                                    .fill(Color(hex: "C9BEAE"))
+                                    .frame(height: 1.5)
+                            }
+                            .offset(y: -315)
                         }
                     }
-
-                    .padding(.bottom, -80)
+                    .padding(.bottom, -230)
                 }
                 BottomNavBar(selection: $router.tab) { _ in }
                         .frame(height: barHeight)

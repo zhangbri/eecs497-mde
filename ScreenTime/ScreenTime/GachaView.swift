@@ -9,10 +9,10 @@ import SwiftUI
 
 struct GachaView: View {
     @EnvironmentObject private var router: TabRouter
-    //@AppStorage("coins") private var coins: Int = 0
     private let barHeight: CGFloat = 78
     
-    @State private var coins: Int = 1000
+    @AppStorage("coins") private var coins: Int = 0
+
     @State private var showResult = false
         var body: some View {
             GeometryReader { proxy in
@@ -117,7 +117,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: { spendCoins(500) })  {
-                                                                Text("10x Roll")
+                                                                Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
                                                                     .frame(width: 82, height: 31)
@@ -209,7 +209,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: { spendCoins(300) })  {
-                                                                Text("10x Roll")
+                                                                Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
                                                                     .frame(width: 82, height: 31)
@@ -305,7 +305,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: { spendCoins(600) })  {
-                                                                Text("10x Roll")
+                                                                Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
                                                                     .frame(width: 82, height: 31)
