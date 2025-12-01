@@ -388,6 +388,8 @@ struct GachaResultView: View {
                                 .foregroundColor(.black)
                                 .font(.system(size:25, weight: .bold))
                         }
+                        .offset(y: 35)
+                        .offset(x: -12.5)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -399,24 +401,24 @@ struct GachaResultView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 318, height: 318)
-                    .offset(y: -15)
+                    .offset(y: -30)
                 
                 VStack {
                     Text("you unlocked")
                         .font(.custom("Sarabun-Regular", size: 30))
                         .foregroundColor(.black)
-                        .offset(y: -30)
+                        .offset(y: -45)
                     
                     Text("RARE")
                         .font(.custom("VictorMono-Regular", size: 40))
                         .foregroundColor(Color(hex: "E62222"))
                         .shadow(color: Color(hex: "E62222"), radius: 4, x: 0, y: 1)
-                        .offset(y: -30)
+                        .offset(y: -40)
                     
                     Text("Orange Tabby")
                         .font(.custom("Sarabun-Regular", size: 50))
                         .foregroundColor(.black)
-                        .offset(y: -42.5)
+                        .offset(y: -55)
                     }
                 
                 VStack {
@@ -437,6 +439,7 @@ struct GachaResultView: View {
                             )
                     }
                     
+                    
                     Button {
                         dismiss()
                     } label: {
@@ -455,7 +458,7 @@ struct GachaResultView: View {
                     }
                     .offset(y: 10)
                 }
-                .offset(y: -45)
+                .offset(y: -55)
                 
                 Spacer()
             }

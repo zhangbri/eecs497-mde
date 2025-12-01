@@ -41,17 +41,19 @@ struct HomeView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 318, height: 318)
-                            .offset(y: -160)
+                            .offset(y: -210)
                         
                         Text("\(hours)h \(minutes)m")
                             .font(.custom("Moulpali-Regular", size: 65))
                             .foregroundColor(.black)
-                            .offset(y: 25)
+                            .offset(y: -25)
+                            .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
                         
                         Text("hours saved")
                             .font(.custom("Sarabun-Thin", size: 30))
                             .foregroundColor(.black)
-                            .offset(y: 70)
+                            .offset(y: 20)
+                            .shadow(color: Color.black.opacity(0.25), radius: 6, x: 0, y: 5)
                         
                         RoundedRectangle(cornerRadius: 20)
                             .fill(Color(hex: "F2EDE7"))
@@ -142,7 +144,7 @@ struct HomeView: View {
                                 }
                                     .offset(y: -10)
                             )
-                            .offset(y: 225)
+                            .offset(y: 175)
                             .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
                         
                         VStack {
@@ -181,10 +183,25 @@ struct HomeView: View {
                             .padding(.leading, 15)
                             
                             Spacer()
+                            
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color(hex: "B2E5AB"))
+                                .frame(width: 235, height: 45)
+                                .overlay(
+                                    Text("see stats")
+                                        .font(.custom("Sarabun-Regular", size: 20))
+                                )
+                                .shadow(color: Color.black.opacity(0.25), radius: 4, x: 0, y: 4)
+                                .onTapGesture {
+                                    router.tab = .profile
+                                    DispatchQueue.main.async {
+                                        NotificationCenter.default.post(name: .scrollToBottomProfile, object: nil)
+                                    }
+                                }
+                                .offset(y: -87)
                         }
                     }
                     .frame(maxWidth: .infinity, minHeight: proxy.size.height)
-                    .padding(.bottom, 25)
                 }
                 BottomNavBar(selection: $router.tab) { _ in }
                     .frame(height: barHeight)
@@ -326,8 +343,8 @@ struct SessionView: View {
                             .offset(y: -75)
                         
                         Button {
-                            if sessionCoins > 0 && remaining > 0 {
-                                showConfirmEnd = true
+                            if remaining > 0 {
+                                    showConfirmEnd = true
                             } else {
                                 endNow()
                             }
@@ -408,4 +425,7 @@ struct SessionView: View {
 
 #Preview {
     HomeView().environmentObject(TabRouter())
+}
+extension Notification.Name {
+    static let scrollToBottomProfile = Notification.Name("scrollToBottomProfile")
 }

@@ -28,7 +28,7 @@ struct BottomNavBar: View {
     var body: some View {
         ZStack {
             Rectangle()
-                .fill(Color(hex: "EBE3D7"))
+                .fill(Color(hex: "dacbb5"))
                 .frame(height: 78)
                 .overlay(
                     Rectangle()
