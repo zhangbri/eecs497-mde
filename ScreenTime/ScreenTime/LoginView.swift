@@ -11,12 +11,17 @@ import Supabase
 struct LoginView: View {
     var onTapCreateAccount: () -> Void = {}
     var onSignInSuccess: () -> Void = {}
+    
     @State private var email: String = ""
     @State private var password: String = ""
     @State private var errorMessage: String?
     @State private var isLoading = false
     @State private var showPassword = false
-
+    
+    // Persist logged-in user for Friends / Leaderboard
+    @AppStorage("currentUserEmail") private var currentUserEmail: String = ""
+    @AppStorage("currentUserId") private var currentUserId: Int = 0
+    
     var body: some View {
         NavigationStack {
             ZStack(alignment: .topLeading) {
@@ -34,7 +39,10 @@ struct LoginView: View {
                         .cornerRadius(8)
                         .overlay(
                             VStack(alignment: .leading, spacing: 5) {
-                                Text("Email").font(.custom("Moulpali-Regular", size: 16)).foregroundColor(.black)
+                                Text("Email")
+                                    .font(.custom("Moulpali-Regular", size: 16))
+                                    .foregroundColor(.black)
+                                
                                 TextField("Email", text: $email)
                                     .font(.custom("Moulpali-Regular", size: 16))
                                     .padding(.leading, 16)
@@ -69,7 +77,7 @@ struct LoginView: View {
                                     .frame(width: 272, height: 40, alignment: .leading)
                                     .background(Color.white)
                                     .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.gray, lineWidth: 1))
-
+                                    
                                     Button(action: { showPassword.toggle() }) {
                                         Image(systemName: showPassword ? "eye.slash" : "eye")
                                             .foregroundColor(.gray)
@@ -93,7 +101,7 @@ struct LoginView: View {
                                         .padding(.top, 17)
                                 }
                                 .disabled(isLoading)
-
+                                
                                 ZStack(alignment: .topLeading) {
                                     if let errorMessage = errorMessage {
                                         Text(errorMessage)
@@ -120,8 +128,8 @@ struct LoginView: View {
                                         .padding(.top, -5)
                                 }
                             }
-                                .padding(.top, 17.5)
-                                .padding(.leading, 23.5),
+                            .padding(.top, 17.5)
+                            .padding(.leading, 23.5),
                             alignment: .topLeading
                         )
                         .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.black, lineWidth: 1))
@@ -130,25 +138,25 @@ struct LoginView: View {
             }
         }
     }
-
+    
     private struct UserRow: Decodable {
         let id: Int
         let email: String
         let password: String
     }
-
+    
     private func signIn() async {
         guard !email.isEmpty, !password.isEmpty else {
             errorMessage = "Please enter email and password."
             return
         }
-
+        
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
-
+        
         let client = SupabaseManager.shared.client
-
+        
         do {
             let users: [UserRow] = try await client
                 .from("users")
@@ -158,15 +166,19 @@ struct LoginView: View {
                 .limit(1)
                 .execute()
                 .value
-
-            if users.isEmpty {
+            
+            guard let user = users.first else {
                 errorMessage = "Incorrect email or password."
                 return
             }
-
+            
+            // Save logged-in user so other screens can use it
+            currentUserId = user.id
+            currentUserEmail = user.email
+            
             errorMessage = nil
             onSignInSuccess()
-
+            
         } catch {
             print("Login error:", error)
             errorMessage = "Incorrect email or password."
@@ -174,9 +186,8 @@ struct LoginView: View {
     }
 }
 
-
 #Preview {
-        LoginView()
+    LoginView()
 }
 
 // Helper extension to use hex codes

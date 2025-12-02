@@ -6,19 +6,25 @@
 //
 
 import SwiftUI
+import Supabase
 
 struct Friend: Identifiable, Equatable {
     let id = UUID()
-    let name: String
-    let handle: String
+    let name: String     // derived from email
+    let handle: String   // the email itself
 }
 
 struct FriendsView: View {
     @EnvironmentObject private var router: TabRouter
     @Environment(\.dismiss) private var dismiss
     @AppStorage("coins") private var coins: Int = 0
+    @AppStorage("currentUserEmail") private var currentUserEmail: String = ""
+    
     @State private var showingAddFriends = false
-    @State private var friends: [Friend] = (0..<10).map { _ in Friend(name: "User", handle: "@User") }
+    @State private var friends: [Friend] = []
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    
     private let barHeight: CGFloat = 78
     
     var body: some View {
@@ -28,92 +34,9 @@ struct FriendsView: View {
                 
                 ScrollView(.vertical) {
                     VStack {
-                        HStack {
-                            Image("logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 49)
-                            Text("pawse")
-                                .font(.custom("VictorMono-Regular", size: 30))
-                            Spacer()
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(hex: "F2EDE7"))
-                                    .frame(width: 110, height: 49)
-                                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                                HStack {
-                                    Image("coin")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 51, height: 51)
-                                        .offset(x: 5, y: 1)
-                                    Text("\(coins)")
-                                        .font(.custom("Moulpali-Regular", size: 25))
-                                        .frame(width: 60, alignment: .center)
-                                        .offset(x: -8)
-                                }
-                            }
-                            .offset(x: -15)
-                        }
-                        .padding(.leading, 15)
-                        .padding(.top, 8)
-                        
-                        ZStack {
-                            Text("Friends")
-                                .font(.custom("Moulpali-Regular", size: 48))
-                                .foregroundColor(.black)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .overlay(
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    dismiss()
-                                }) {
-                                    Image("rightarrow")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 48, height: 48)
-                                }
-                            }
-                        )
-                        .offset(y: -43)
-                        
-                        ScrollView(.vertical, showsIndicators: true) {
-                            VStack(spacing: 25) {
-                                ForEach(friends) { friend in
-                                    FriendRowView(
-                                        name: friend.name,
-                                        handle: friend.handle,
-                                        onRemove: {
-                                            friends.removeAll { $0.id == friend.id }
-                                        }
-                                    )
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.horizontal, 20)
-                                }
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 375)
-                        .offset(y: -135)
-                        
-                        VStack {
-                            Button {
-                                showingAddFriends = true
-                            } label: {
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .frame(width: 220, height: 50)
-                                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                                    .overlay(
-                                        Text("Add Friends")
-                                            .font(.custom("Moulpali-Regular", size: 30))
-                                            .foregroundColor(.black)
-                                    )
-                            }
-                        }
-                        .offset(y: -130)
+                        header
+                        friendsList
+                        addFriendsButton
                     }
                 }
                 
@@ -126,11 +49,301 @@ struct FriendsView: View {
                 if showingAddFriends {
                     Color.black.opacity(0.35)
                         .ignoresSafeArea()
-                    AddFriendsPopup(isPresented: $showingAddFriends)
+                    AddFriendsPopup(
+                        isPresented: $showingAddFriends,
+                        onAddFriend: { emailOrHandle in
+                            Task { await addFriend(email: emailOrHandle) }
+                        }
+                    )
                 }
+            }
+            .onAppear {
+                Task { await loadFriends() }
             }
         }
     }
+    
+    // MARK: - UI pieces
+    
+    private var header: some View {
+        VStack {
+            HStack {
+                Image("logo")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 49)
+                Text("pawse")
+                    .font(.custom("VictorMono-Regular", size: 30))
+                Spacer()
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color(hex: "F2EDE7"))
+                        .frame(width: 110, height: 49)
+                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                    HStack {
+                        Image("coin")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 51, height: 51)
+                            .offset(x: 5, y: 1)
+                        Text("\(coins)")
+                            .font(.custom("Moulpali-Regular", size: 25))
+                            .frame(width: 60, alignment: .center)
+                            .offset(x: -8)
+                    }
+                }
+                .offset(x: -15)
+            }
+            .padding(.leading, 15)
+            .padding(.top, 8)
+            
+            ZStack {
+                Text("Friends")
+                    .font(.custom("Moulpali-Regular", size: 48))
+                    .foregroundColor(.black)
+            }
+            .frame(maxWidth: .infinity)
+            .overlay(
+                HStack {
+                    Spacer()
+                    Button(action: { dismiss() }) {
+                        Image("rightarrow")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 48, height: 48)
+                    }
+                }
+            )
+            .offset(y: -43)
+        }
+    }
+    
+    private var friendsList: some View {
+        VStack {
+            if let errorMessage = errorMessage {
+                Text(errorMessage)
+                    .foregroundColor(.red)
+                    .font(.footnote)
+                    .padding(.bottom, 4)
+            }
+            
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(spacing: 25) {
+                    if friends.isEmpty && !isLoading {
+                        Text("No friends yet. Add some!")
+                            .font(.custom("Moulpali-Regular", size: 18))
+                    } else {
+                        ForEach(friends) { friend in
+                            FriendRowView(
+                                name: friend.name,
+                                handle: friend.handle,
+                                onRemove: {
+                                    Task { await removeFriend(friend: friend) }
+                                }
+                            )
+                            .frame(maxWidth: .infinity)
+                            .padding(.horizontal, 20)
+                        }
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 375)
+            .offset(y: -135)
+        }
+    }
+    
+    private var addFriendsButton: some View {
+        VStack {
+            Button {
+                showingAddFriends = true
+            } label: {
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(hex: "B2E5AB"))
+                    .frame(width: 220, height: 50)
+                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+                    .overlay(
+                        Text("Add Friends")
+                            .font(.custom("Moulpali-Regular", size: 30))
+                            .foregroundColor(.black)
+                    )
+            }
+        }
+        .offset(y: -130)
+    }
+    
+    // MARK: - DB models
+    
+    private struct DBUser: Decodable {
+        let id: Int?
+        let email: String
+        let friends: [String]?
+    }
+    
+    // MARK: - DB logic
+    
+    private func loadFriends() async {
+        guard !currentUserEmail.isEmpty else {
+            errorMessage = "No logged-in user."
+            return
+        }
+        
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        
+        let client = SupabaseManager.shared.client
+        
+        do {
+            // 1) Get current user to read friends array
+            let rows: [DBUser] = try await client
+                .from("users")
+                .select("email,friends")
+                .eq("email", value: currentUserEmail)
+                .limit(1)
+                .execute()
+                .value
+            
+            guard let me = rows.first else {
+                errorMessage = "Current user not found in DB."
+                return
+            }
+            
+            let friendEmails = me.friends ?? []
+            if friendEmails.isEmpty {
+                friends = []
+                return
+            }
+            
+            // 2) Load friend users by email
+            let friendRows: [DBUser] = try await client
+                .from("users")
+                .select("email")
+                .in("email", value: friendEmails)
+                .execute()
+                .value
+            
+            friends = friendRows.map { row in
+                Friend(
+                    name: usernameFromEmail(row.email),
+                    handle: row.email
+                )
+            }
+        } catch {
+            print("Load friends error:", error)
+            errorMessage = "Failed to load friends."
+        }
+    }
+    
+    private func addFriend(email: String) async {
+        let trimmed = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return }
+        guard !currentUserEmail.isEmpty else { return }
+        
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        
+        let client = SupabaseManager.shared.client
+        
+        do {
+            // 1) Get current user's existing friends
+            let rows: [DBUser] = try await client
+                .from("users")
+                .select("email,friends")
+                .eq("email", value: currentUserEmail)
+                .limit(1)
+                .execute()
+                .value
+            
+            guard let me = rows.first else { return }
+            var friendEmails = me.friends ?? []
+            
+            if friendEmails.contains(trimmed) {
+                errorMessage = "Already friends with this user."
+                return
+            }
+            
+            // 2) Check that the target user exists
+            let existing: [DBUser] = try await client
+                .from("users")
+                .select("email")
+                .eq("email", value: trimmed)
+                .limit(1)
+                .execute()
+                .value
+            
+            if existing.isEmpty {
+                errorMessage = "No user exists with that email."
+                return
+            }
+            
+            friendEmails.append(trimmed)
+            
+            // 3) Update DB friends array
+            try await client
+                .from("users")
+                .update(["friends": friendEmails])
+                .eq("email", value: currentUserEmail)
+                .execute()
+            
+            // 4) Append to local list
+            if let row = existing.first {
+                let newFriend = Friend(
+                    name: usernameFromEmail(row.email),
+                    handle: row.email
+                )
+                friends.append(newFriend)
+            }
+        } catch {
+            print("Add friend error:", error)
+            errorMessage = "Failed to add friend."
+        }
+    }
+    
+    private func removeFriend(friend: Friend) async {
+        guard !currentUserEmail.isEmpty else { return }
+        
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        
+        let client = SupabaseManager.shared.client
+        
+        do {
+            // 1) Get current user's friend list
+            let rows: [DBUser] = try await client
+                .from("users")
+                .select("email,friends")
+                .eq("email", value: currentUserEmail)
+                .limit(1)
+                .execute()
+                .value
+            
+            guard let me = rows.first else { return }
+            var friendEmails = me.friends ?? []
+            
+            friendEmails.removeAll { $0 == friend.handle }
+            
+            // 2) Update DB
+            try await client
+                .from("users")
+                .update(["friends": friendEmails])
+                .eq("email", value: currentUserEmail)
+                .execute()
+            
+            // 3) Update local state
+            friends.removeAll { $0.id == friend.id }
+        } catch {
+            print("Remove friend error:", error)
+            errorMessage = "Failed to remove friend."
+        }
+    }
+}
+
+// Helper: turn "user@example.com" into "user"
+private func usernameFromEmail(_ email: String) -> String {
+    email.components(separatedBy: "@").first ?? email
 }
 
 struct FriendRowView: View {
@@ -178,38 +391,13 @@ struct FriendRowView: View {
     }
 }
 
-struct FriendRequestRow: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(Color(hex: "F2EDE7"))
-            .frame(width: 340, height: 80)
-            .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-            .overlay(
-                HStack {
-                    Image("user")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 56, height: 56)
-                        .clipShape(Circle())
-                        .padding(.leading, 16)
-                    
-                    Spacer()
-                    
-                    Image("addfriend")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 34, height: 34)
-                        .padding(.trailing, 18)
-                }
-            )
-    }
-}
-
 struct AddFriendsPopup: View {
     @Binding var isPresented: Bool
     @State private var searchText: String = ""
     @State private var isAdded = false
-
+    
+    let onAddFriend: (String) -> Void
+    
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -243,7 +431,7 @@ struct AddFriendsPopup: View {
                         .foregroundColor(.black)
                         .offset(y: 85)
                     
-                    TextField("Username, phone number, or email", text: $searchText)
+                    TextField("Friend email (for demo)", text: $searchText)
                         .padding(.horizontal, 16)
                         .frame(width: 280, height: 40)
                         .foregroundColor(Color(hex: "2596be"))
@@ -279,20 +467,22 @@ struct AddFriendsPopup: View {
                                     .padding(.leading, 16)
                                 
                                 VStack (alignment: .leading){
-                                    Text("User")
+                                    Text(searchText.isEmpty ? "User" : usernameFromEmail(searchText))
                                         .font(.custom("Moulpali-Regular", size: 26))
                                         .foregroundColor(.black)
                                     
-                                    Text("@User")
+                                    Text(searchText.isEmpty ? "@User" : searchText)
                                         .font(.custom("Sarabun-Light", size: 15))
                                         .foregroundColor(.black)
                                         .offset(y: -12)
                                 }
                                 .offset(y: -2)
+                                
                                 Spacer()
                                 
                                 Button {
                                     isAdded.toggle()
+                                    onAddFriend(searchText)
                                 } label: {
                                     Image(isAdded ? "addedfriend" : "addfriend")
                                         .resizable()
@@ -313,3 +503,4 @@ struct AddFriendsPopup: View {
     FriendsView()
         .environmentObject(TabRouter())
 }
+
