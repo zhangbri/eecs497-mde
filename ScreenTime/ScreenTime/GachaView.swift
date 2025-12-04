@@ -14,6 +14,8 @@ struct GachaView: View {
     @AppStorage("coins") private var coins: Int = 0
 
     @State private var showResult = false
+    @State private var showEggCollection = false
+    
         var body: some View {
             GeometryReader { proxy in
                 ZStack(alignment: .bottom) {
@@ -167,7 +169,9 @@ struct GachaView: View {
 
 
                                                     VStack(alignment: .leading){
-                                                        Button(action: {}) {
+                                                        Button(action: {
+                                                            showEggCollection = true
+                                                        }) {
                                                             Text("View Items")
                                                                 .font(.custom("Moulpali-Regular", size: 16))
                                                                 .foregroundColor(.black)
@@ -350,6 +354,19 @@ struct GachaView: View {
                 .fullScreenCover(isPresented: $showResult) {
                     GachaResultView()
                 }
+                .overlay(
+                    Group {
+                        if showEggCollection {
+                            Color.black.opacity(0.4)
+                                .ignoresSafeArea()
+                                .onTapGesture {
+                                    showEggCollection = false
+                                }
+                            EggCollectionView(isPresented: $showEggCollection)
+                                .transition(.scale)
+                        }
+                    }
+                )
             }
         }
         private func spendCoins(_ cost: Int) {
@@ -358,6 +375,88 @@ struct GachaView: View {
             }
             coins -= cost
         }
+}
+
+struct EggCollectionView: View {
+    @Binding var isPresented: Bool
+
+    let eggs: [(name: String, rarity: String, color: String, image: String)] = [
+        ("White", "Common", "967259", "white-egg"),
+        ("Green", "Common", "967259", "green-egg"),
+        ("Purple", "Rare", "00FF00", "purple-egg"),
+        ("Pink", "Rare", "00FF00", "pink-egg"),
+        ("Blue", "Epic", "A020F0", "blue-egg"),
+        ("Red", "Epic", "A020F0", "red-egg")
+    ]
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with title and close button
+            ZStack {
+                Text("Eggs")
+                    .font(.custom("Moulpali-Regular", size: 36))
+                    .foregroundColor(.black)
+
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 35, height: 35)
+                            Circle()
+                                .stroke(Color.black, lineWidth: 3)
+                                .frame(width: 35, height: 35)
+                            Image(systemName: "xmark")
+                                .foregroundColor(.black)
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.top, 20)
+            .padding(.bottom, 15)
+
+            // Egg grid
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    ForEach(eggs, id: \.name) { egg in
+                        VStack(spacing: 6) {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white)
+                                .frame(width: 120, height: 120)
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                                .overlay(
+                                    Image(egg.image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 95, height: 95)
+                                )
+
+                            Text(egg.name)
+                                .font(.custom("Sarabun-Regular", size: 20))
+                                .foregroundColor(.black)
+
+                            Text(egg.rarity)
+                                .font(.custom("Sarabun-Regular", size: 14))
+                                .foregroundColor(Color(hex: egg.color))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.vertical, 15)
+        }
+        .frame(width: 320, height: 640)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: "EBE3D7"))
+                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        )
+    }
 }
 
 struct GachaResultView: View {
@@ -469,3 +568,4 @@ struct GachaResultView: View {
 #Preview {
     GachaView().environmentObject(TabRouter())
 }
+
