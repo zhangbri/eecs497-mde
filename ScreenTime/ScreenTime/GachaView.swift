@@ -15,6 +15,8 @@ struct GachaView: View {
 
     @State private var showResult = false
     @State private var showEggCollection = false
+    @State private var showSpriteCollection = false
+    @State private var showAccessoryCollection = false
     
         var body: some View {
             GeometryReader { proxy in
@@ -77,7 +79,9 @@ struct GachaView: View {
 
 
                                                     VStack(alignment: .leading){
-                                                        Button(action: {}) {
+                                                        Button(action: {
+                                                            showAccessoryCollection = true
+                                                        }) {
                                                             Text("View Items")
                                                                 .font(.custom("Moulpali-Regular", size: 16))
                                                                 .foregroundColor(.black)
@@ -263,7 +267,9 @@ struct GachaView: View {
 
 
                                                     VStack(alignment: .leading){
-                                                        Button(action: {}) {
+                                                        Button(action: {
+                                                            showSpriteCollection = true
+                                                        }) {
                                                             Text("View Items")
                                                                 .font(.custom("Moulpali-Regular", size: 16))
                                                                 .foregroundColor(.black)
@@ -365,6 +371,28 @@ struct GachaView: View {
                             EggCollectionView(isPresented: $showEggCollection)
                                 .transition(.scale)
                         }
+                        
+                        if showSpriteCollection {
+                            Color.black.opacity(0.4)
+                                .ignoresSafeArea()
+                                .onTapGesture {
+                                    showSpriteCollection = false
+                                }
+                            
+                            SpriteCollectionView(isPresented: $showSpriteCollection)
+                                .transition(.scale)
+                        }
+                        
+                        if showAccessoryCollection {
+                            Color.black.opacity(0.4)
+                                .ignoresSafeArea()
+                                .onTapGesture {
+                                    showAccessoryCollection = false
+                                }
+                            
+                            AccessoryCollectionView(isPresented: $showAccessoryCollection)
+                                .transition(.scale)
+                        }
                     }
                 )
             }
@@ -376,6 +404,173 @@ struct GachaView: View {
             coins -= cost
         }
 }
+
+struct AccessoryCollectionView: View {
+    @Binding var isPresented: Bool
+    
+    let accessories: [(name: String, rarity: String, color: String, image: String)] = [
+        ("Bow Tie", "Common", "967259", "bowtie"),
+        ("Bow", "Common", "967259", "bow"),
+        ("Top Hat", "Rare", "00FF00", "top-hat"),
+        ("Tie", "Rare", "00FF00", "tie"),
+        ("Heart Glasses", "Epic", "A020F0", "heart-glasses"),
+        ("Crown", "Epic", "A020F0", "crown")
+    ]
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with title and close button
+            ZStack {
+                Text("Accessories")
+                    .font(.custom("Moulpali-Regular", size: 36))
+                    .foregroundColor(.black)
+                
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 35, height: 35)
+                            Circle()
+                                .stroke(Color.black, lineWidth: 3)
+                                .frame(width: 35, height: 35)
+                            Image(systemName: "xmark")
+                                .foregroundColor(.black)
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.top, 20)
+            .padding(.bottom, 15)
+            
+            // Accessory grid (matching EggCollectionView style)
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    ForEach(accessories, id: \.name) { accessory in
+                        VStack(spacing: 6) {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white)
+                                .frame(width: 120, height: 120)
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                                .overlay(
+                                    Image(accessory.image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 95, height: 95)
+                                )
+                            
+                            Text(accessory.name)
+                                .font(.custom("Sarabun-Regular", size: 20))
+                                .foregroundColor(.black)
+                            
+                            Text(accessory.rarity)
+                                .font(.custom("Sarabun-Regular", size: 14))
+                                .foregroundColor(Color(hex: accessory.color))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.vertical, 15)
+        }
+        .frame(width: 320, height: 640)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: "EBE3D7"))
+                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        )
+    }
+}
+
+
+struct SpriteCollectionView: View {
+    @Binding var isPresented: Bool
+    
+    let sprites: [(name: String, rarity: String, color: String, image: String)] = [
+        ("Grey Tabby", "Common", "967259", "grey-tabby-cat"),
+        ("White Cat", "Common", "967259", "white-cat"),
+        ("Orange Tabby Cat", "Rare", "00FF00", "orange-tabby-cat"),
+        ("Grey White Cat", "Rare", "00FF00", "grey-white-cat"),
+        ("Tuxedo Cat", "Epic", "A020F0", "tuxedo-cat"),
+        ("Black Cat", "Epic", "A020F0", "black-cat")
+    ]
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header with title and close button
+            ZStack {
+                Text("Sprites")
+                    .font(.custom("Moulpali-Regular", size: 36))
+                    .foregroundColor(.black)
+                
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white)
+                                .frame(width: 35, height: 35)
+                            Circle()
+                                .stroke(Color.black, lineWidth: 3)
+                                .frame(width: 35, height: 35)
+                            Image(systemName: "xmark")
+                                .foregroundColor(.black)
+                                .font(.system(size: 18, weight: .bold))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.top, 20)
+            .padding(.bottom, 15)
+            
+            // Sprite grid (matching egg style)
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
+                    ForEach(sprites, id: \.name) { sprite in
+                        VStack(spacing: 6) {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.white)
+                                .frame(width: 120, height: 120)
+                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                                .overlay(
+                                    Image(sprite.image)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 95, height: 95)
+                                )
+                            
+                            Text(sprite.name)
+                                .font(.custom("Sarabun-Regular", size: 20))
+                                .foregroundColor(.black)
+                            
+                            Text(sprite.rarity)
+                                .font(.custom("Sarabun-Regular", size: 14))
+                                .foregroundColor(Color(hex: sprite.color))
+                        }
+                    }
+                }
+                .padding(.horizontal, 20)
+            }
+            .padding(.vertical, 15)
+        }
+        .frame(width: 320, height: 640)
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(hex: "EBE3D7"))
+                .shadow(color: .black.opacity(0.3), radius: 10, x: 0, y: 5)
+        )
+    }
+}
+
+
 
 struct EggCollectionView: View {
     @Binding var isPresented: Bool
