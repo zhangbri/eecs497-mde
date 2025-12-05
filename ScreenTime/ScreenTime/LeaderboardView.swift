@@ -18,7 +18,8 @@ struct LeaderboardView: View {
     @EnvironmentObject private var router: TabRouter
     @AppStorage("coins") private var coins: Int = 0
     @AppStorage("currentUserEmail") private var currentUserEmail: String = ""
-    
+    @AppStorage("stats_total_minutes") private var totalSessionMinutes: Int = 0
+
     @State private var showingShareSheet = false
     @State private var showingFriends = false
     @State private var users: [LeaderboardUser] = []
@@ -193,7 +194,9 @@ struct LeaderboardView: View {
                     
                     Text(user != nil ? usernameFromEmail(user!.email) : "User")
                         .font(.custom("Moulpali-Regular", size: 30))
-                    Text(user != nil ? formattedHours(user!.total_hours) : "0 hrs")
+                    
+                    let mins = displayMinutes(for: user)
+                    Text("\(mins) mins")
                         .font(.custom("Moulpali-Regular", size: 16))
                         .offset(y: -25)
                 }
@@ -231,7 +234,8 @@ struct LeaderboardView: View {
                         .offset(x: -20)
                     Text(usernameFromEmail(user.email))
                         .font(.custom("Moulpali-Regular", size: 30))
-                    Text(formattedHours(user.total_hours))
+                    let mins = displayMinutes(for: user)
+                    Text("\(mins) mins")
                         .font(.custom("Moulpali-Regular", size: 16))
                         .offset(x: 58)
                 }
@@ -326,6 +330,18 @@ struct LeaderboardView: View {
             errorMessage = "Failed to load leaderboard."
         }
     }
+    private func displayMinutes(for user: LeaderboardUser?) -> Int {
+        guard let user else { return 0 }
+        
+        if user.email == currentUserEmail {
+            // use local totalSessionMinutes directly
+            return totalSessionMinutes
+        } else {
+            // convert Supabase hours → minutes for display
+            return user.total_hours * 60
+        }
+    }
+
 }
 
 
