@@ -72,6 +72,7 @@ let allSprites: [Sprite] = [
 
 struct GachaView: View {
     @EnvironmentObject private var router: TabRouter
+    @EnvironmentObject private var inventory: InventoryModel
     private let barHeight: CGFloat = 78
     
     @AppStorage("coins") private var coins: Int = 0
@@ -166,10 +167,11 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(50) {
-                                                                    rolledAccessory = allAccessories.randomElement()
-                                                                    showAccessoryResult = rolledAccessory != nil
-                                                                }
+                                                                if spendCoins(50), let accessory = allAccessories.randomElement() {
+                                                                        inventory.add(accessory: accessory)
+                                                                        rolledAccessory = accessory
+                                                                        showAccessoryResult = true
+                                                                    }
                                                             }) {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -197,7 +199,25 @@ struct GachaView: View {
                                                         .offset(x:4, y:-9)
 
                                                         ZStack{
-                                                            Button(action: { spendCoins(500) })  {
+                                                            Button(action: {
+                                                                if spendCoins(500) {
+                                                                    var lastNewAccessory: Accessory?
+
+                                                                    for _ in 0..<5 {
+                                                                        if let accessory = allAccessories.randomElement() {
+                                                                            if inventory.add(accessory: accessory) {
+                                                                                lastNewAccessory = accessory
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    // If you pulled at least one *new* accessory, show the result view
+                                                                    if let accessory = lastNewAccessory {
+                                                                        rolledAccessory = accessory
+                                                                        showAccessoryResult = true
+                                                                    }
+                                                                }
+                                                            }) {
                                                                 Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -265,9 +285,11 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(30) {
-                                                                    rolledEgg = allEggs.randomElement()
-                                                                    showEggResult = rolledEgg != nil
+                                                                if spendCoins(30),
+                                                                   let egg = allEggs.randomElement() {
+                                                                    _ = inventory.add(egg: egg)
+                                                                    rolledEgg = egg
+                                                                    showEggResult = true
                                                                 }
                                                             }) {
                                                                 Text("1x Roll")
@@ -296,7 +318,24 @@ struct GachaView: View {
                                                         .offset(y:-9)
 
                                                         ZStack{
-                                                            Button(action: { spendCoins(300) })  {
+                                                            Button(action: {
+                                                                if spendCoins(300) {
+                                                                    var lastNewEgg: Egg?
+
+                                                                    for _ in 0..<5 {
+                                                                        if let egg = allEggs.randomElement() {
+                                                                            if inventory.add(egg: egg) {
+                                                                                lastNewEgg = egg
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if let egg = lastNewEgg {
+                                                                        rolledEgg = egg
+                                                                        showEggResult = true
+                                                                    }
+                                                                }
+                                                            }) {
                                                                 Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -364,9 +403,11 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(60) {
-                                                                    rolledSprite = allSprites.randomElement()
-                                                                    showSpriteResult = rolledSprite != nil
+                                                                if spendCoins(60),
+                                                                   let sprite = allSprites.randomElement() {
+                                                                    _ = inventory.add(sprite: sprite)
+                                                                    rolledSprite = sprite
+                                                                    showSpriteResult = true
                                                                 }
                                                             }) {
                                                                 Text("1x Roll")
@@ -395,7 +436,24 @@ struct GachaView: View {
                                                         .offset( y:-9)
 
                                                         ZStack{
-                                                            Button(action: { spendCoins(600) })  {
+                                                            Button(action: {
+                                                                if spendCoins(600) {
+                                                                    var lastNewSprite: Sprite?
+
+                                                                    for _ in 0..<5 {
+                                                                        if let sprite = allSprites.randomElement() {
+                                                                            if inventory.add(sprite: sprite) {
+                                                                                lastNewSprite = sprite
+                                                                            }
+                                                                        }
+                                                                    }
+
+                                                                    if let sprite = lastNewSprite {
+                                                                        rolledSprite = sprite
+                                                                        showSpriteResult = true
+                                                                    }
+                                                                }
+                                                            }) {
                                                                 Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
                                                                     .foregroundColor(.black)
@@ -1189,6 +1247,8 @@ struct SpriteResultView: View {
 }
 
 #Preview {
-    GachaView().environmentObject(TabRouter())
+    GachaView()
+        .environmentObject(TabRouter())
+        .environmentObject(InventoryModel())
 }
 

@@ -13,6 +13,7 @@ private enum InventoryTab: String, CaseIterable {
 
 struct InventoryView: View {
     @EnvironmentObject private var router: TabRouter
+    @EnvironmentObject private var inventory: InventoryModel
     @AppStorage("coins") private var coins: Int = 0
     @State private var invTab: InventoryTab = .sprites
     private let gridCols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
@@ -126,27 +127,51 @@ struct InventoryView: View {
             switch tab {
             case .sprites:
                 gridPanel {
-                    ForEach(0..<6, id: \.self) { i in
+                    ForEach(0..<10, id: \.self) { index in
                         inventoryCard {
-                            if i == 0 { Image("sprite_cat").resizable().scaledToFit().padding(14) }
+                            if index < inventory.sprites.count {
+                                let sprite = inventory.sprites[index]
+                                Image(sprite.imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(14)
+                            } else {
+                                
+                            }
                         }
                     }
                 }
-            case .items:
+
+            case .items: // accessories
                 gridPanel {
-                    ForEach(0..<6, id: \.self) { _ in
+                    ForEach(0..<10, id: \.self) { index in
                         inventoryCard {
-                            Image(systemName: "gift")
-                                .font(.system(size: 55))
-                                .foregroundColor(.black.opacity(0.6))
+                            if index < inventory.accessories.count {
+                                let accessory = inventory.accessories[index]
+                                Image(accessory.imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(14)
+                            } else {
+
+                            }
                         }
                     }
                 }
+
             case .eggs:
                 gridPanel {
-                    ForEach(0..<6, id: \.self) { _ in
+                    ForEach(0..<9, id: \.self) { index in
                         inventoryCard {
-                            Image("egg").resizable().scaledToFit().padding(18)
+                            if index < inventory.eggs.count {
+                                let egg = inventory.eggs[index]
+                                Image(egg.imageName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .padding(14)
+                            } else {
+
+                            }
                         }
                     }
                 }
@@ -173,5 +198,7 @@ struct InventoryView: View {
 
 }
 #Preview {
-    InventoryView().environmentObject(TabRouter())
+    InventoryView()
+        .environmentObject(TabRouter())
+        .environmentObject(InventoryModel())
 }

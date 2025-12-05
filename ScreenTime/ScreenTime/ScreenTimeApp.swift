@@ -10,17 +10,20 @@ import SwiftUI
 @main
 struct ScreenTimeApp: App {
     @StateObject private var router = TabRouter()
-    
+    @StateObject private var inventory = InventoryModel()
+
     init() {
-        UserDefaults.standard.register(defaults: [
-            "coins": 2000
-        ])
+        #if DEBUG
+
+        UserDefaults.standard.set(9999, forKey: "coins")
+        #endif
     }
     
     var body: some Scene {
         WindowGroup {
             AuthRootView()
                 .environmentObject(router)
+                .environmentObject(inventory)    
         }
     }
 }
