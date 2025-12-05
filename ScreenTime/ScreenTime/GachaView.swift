@@ -16,12 +16,16 @@ struct Accessory: Identifiable, Equatable {
 }
 
 let allAccessories: [Accessory] = [
-    .init(name: "Bow Tie",        rarity: "Common", colorHex: "967259", imageName: "bowtie"),
-    .init(name: "Bow",            rarity: "Common", colorHex: "967259", imageName: "bow"),
-    .init(name: "Top Hat",        rarity: "Rare",   colorHex: "00FF00", imageName: "top-hat"),
-    .init(name: "Tie",            rarity: "Rare",   colorHex: "00FF00", imageName: "tie"),
-    .init(name: "Heart Glasses",  rarity: "Epic",   colorHex: "A020F0", imageName: "heart-glasses"),
-    .init(name: "Crown",          rarity: "Epic",   colorHex: "A020F0", imageName: "crown")
+    .init(name: "Bowtie",        rarity: "Common", colorHex: "884723", imageName: "bowtie"),
+    .init(name: "Bow",            rarity: "Common", colorHex: "884723", imageName: "bow"),
+    .init(name: "Angry Vein",  rarity: "Uncommon",   colorHex: "39B500", imageName: "angry vien"),
+    .init(name: "Chef Hat", rarity: "Uncommon",   colorHex: "39B500", imageName: "chef hat"),
+    .init(name: "Top Hat",        rarity: "Rare",   colorHex: "005FCC", imageName: "top-hat"),
+    .init(name: "Tie",            rarity: "Rare",   colorHex: "005FCC", imageName: "tie"),
+    .init(name: "Heart Glasses",  rarity: "Epic",   colorHex: "AA00A8", imageName: "heart-glasses"),
+    .init(name: "Crown",          rarity: "Epic",   colorHex: "AA00A8", imageName: "crown"),
+    .init(name: "Chain",          rarity: "Legendary",   colorHex: "D4A017", imageName: "chain"),
+    .init(name: "Sunglasses",  rarity: "Legendary",   colorHex: "D4A017", imageName: "sunglasses"),
 ]
 
 struct Egg: Identifiable, Equatable {
@@ -33,12 +37,16 @@ struct Egg: Identifiable, Equatable {
 }
 
 let allEggs: [Egg] = [
-    .init(name: "White",  rarity: "Common", colorHex: "967259", imageName: "white-egg"),
-    .init(name: "Green",  rarity: "Common", colorHex: "967259", imageName: "green-egg"),
-    .init(name: "Purple", rarity: "Rare",   colorHex: "00FF00", imageName: "purple-egg"),
-    .init(name: "Pink",   rarity: "Rare",   colorHex: "00FF00", imageName: "pink-egg"),
-    .init(name: "Blue",   rarity: "Epic",   colorHex: "A020F0", imageName: "blue-egg"),
-    .init(name: "Red",    rarity: "Epic",   colorHex: "A020F0", imageName: "red-egg")
+    .init(name: "White",  rarity: "Common", colorHex: "884723", imageName: "white-egg"),
+    .init(name: "Green",  rarity: "Common", colorHex: "884723", imageName: "green-egg"),
+    .init(name: "Purple", rarity: "Uncommon",   colorHex: "39B500", imageName: "purple-egg"),
+    .init(name: "Pink",   rarity: "Uncommon",   colorHex: "39B500", imageName: "pink-egg"),
+    .init(name: "Blue",   rarity: "Rare",   colorHex: "005FCC", imageName: "blue-egg"),
+    .init(name: "Red",    rarity: "Rare",   colorHex: "005FCC", imageName: "red-egg"),
+    .init(name: "Stripe",   rarity: "Epic",   colorHex: "AA00A8", imageName: "Stripe"),
+    .init(name: "Lavender",    rarity: "Epic",   colorHex: "AA00A8", imageName: "Lavender"),
+    .init(name: "Terracotta",    rarity: "Legendary",   colorHex: "D4A017", imageName: "Terracotta")
+    
 ]
 
 struct Sprite: Identifiable, Equatable {
@@ -50,12 +58,16 @@ struct Sprite: Identifiable, Equatable {
 }
 
 let allSprites: [Sprite] = [
-    .init(name: "Grey Tabby",      rarity: "Common", colorHex: "967259", imageName: "grey-tabby-cat"),
-    .init(name: "White Cat",       rarity: "Common", colorHex: "967259", imageName: "white-cat"),
-    .init(name: "Orange Tabby Cat",rarity: "Rare",   colorHex: "00FF00", imageName: "orange-tabby-cat"),
-    .init(name: "Grey White Cat",  rarity: "Rare",   colorHex: "00FF00", imageName: "grey-white-cat"),
-    .init(name: "Tuxedo Cat",      rarity: "Epic",   colorHex: "A020F0", imageName: "tuxedo-cat"),
-    .init(name: "Black Cat",       rarity: "Epic",   colorHex: "A020F0", imageName: "black-cat")
+    .init(name: "Grey Tabby",      rarity: "Common", colorHex: "884723", imageName: "grey-tabby-cat"),
+    .init(name: "White",       rarity: "Common", colorHex: "884723", imageName: "white-cat"),
+    .init(name: "Orange Tabby",rarity: "Uncommon",   colorHex: "39B500", imageName: "orange-tabby-cat"),
+    .init(name: "Grey White",  rarity: "Uncommon",   colorHex: "39B500", imageName: "grey-white-cat"),
+    .init(name: "Tuxedo",      rarity: "Rare",   colorHex: "005FCC", imageName: "tuxedo-cat"),
+    .init(name: "Black",       rarity: "Rare",   colorHex: "005FCC", imageName: "black-cat"),
+    .init(name: "Prussian",      rarity: "Epic",   colorHex: "AA00A8", imageName: "prussian cat"),
+    .init(name: "Pink",       rarity: "Epic",   colorHex: "AA00A8", imageName: "pink cat"),
+    .init(name: "Calico",      rarity: "Legendary",   colorHex: "D4A017", imageName: "calico cat"),
+    .init(name: "Siamese",       rarity: "Legendary",   colorHex: "D4A017", imageName: "siamese cat")
 ]
 
 struct GachaView: View {
@@ -499,45 +511,36 @@ struct AccessoryCollectionView: View {
     let accessories: [Accessory]
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with title and close button
+        VStack {
             ZStack {
                 Text("Accessories")
-                    .font(.custom("Moulpali-Regular", size: 36))
+                    .font(.custom("Moulpali-Regular", size: 40))
                     .foregroundColor(.black)
-                
+                    .offset(y:-10)
                 HStack {
                     Spacer()
                     Button {
                         isPresented = false
                     } label: {
-                        ZStack {
-                            Circle()
-                                .fill(Color.white)
-                                .frame(width: 35, height: 35)
-                            Circle()
-                                .stroke(Color.black, lineWidth: 3)
-                                .frame(width: 35, height: 35)
-                            Image(systemName: "xmark")
-                                .foregroundColor(.black)
-                                .font(.system(size: 18, weight: .bold))
-                        }
+                        Image("close")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(.black)
+                            .offset(y:-15)
+                            .offset(x:-12.5)
                     }
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.top, 20)
-            .padding(.bottom, 15)
             
-            // Accessory grid (matching EggCollectionView style)
             ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(accessories) { accessory in
-                        VStack(spacing: 6) {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .frame(width: 120, height: 120)
-                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+                    ForEach(Array(accessories.enumerated()), id: \.element.id) { index, accessory in
+                        VStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(hex: "F2EDE7"))
+                                .frame(width: 110, height: 110)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                                 .overlay(
                                     Image(accessory.imageName)
                                         .resizable()
@@ -546,20 +549,36 @@ struct AccessoryCollectionView: View {
                                 )
                             
                             Text(accessory.name)
-                                .font(.custom("Sarabun-Regular", size: 20))
+                                .font(.custom("Moulpali-Regular", size: 26))
                                 .foregroundColor(.black)
+                                .offset(y:-30)
                             
                             Text(accessory.rarity)
-                                .font(.custom("Sarabun-Regular", size: 14))
+                                .font(.custom("VictorMono-Regular", size: 16))
                                 .foregroundColor(Color(hex: accessory.colorHex))
+                                .offset(y:-45)
                         }
+                        .offset(x: index % 2 == 0 ? 10 : -10)
+                        .padding(.top, {
+                            switch index {
+                            case 0, 1:
+                                0
+                            case 2, 3:
+                                -30
+                            case 4, 5:
+                                -30
+                            case 6, 7:
+                                -30
+                            default:
+                                -30
+                            }
+                        }())
                     }
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.vertical, 15)
+            .padding(.top, -70)
         }
-        .frame(width: 320, height: 640)
+        .frame(width: 340, height: 660)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(hex: "EBE3D7"))
@@ -568,51 +587,41 @@ struct AccessoryCollectionView: View {
     }
 }
 
-
 struct SpriteCollectionView: View {
     @Binding var isPresented: Bool
     let sprites: [Sprite]
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with title and close button
+        VStack {
             ZStack {
                 Text("Sprites")
-                    .font(.custom("Moulpali-Regular", size: 36))
+                    .font(.custom("Moulpali-Regular", size: 40))
                     .foregroundColor(.black)
-                
+                    .offset(y:-10)
                 HStack {
                     Spacer()
                     Button {
                         isPresented = false
                     } label: {
-                        ZStack {
-                            Circle()
-                                .fill(Color.white)
-                                .frame(width: 35, height: 35)
-                            Circle()
-                                .stroke(Color.black, lineWidth: 3)
-                                .frame(width: 35, height: 35)
-                            Image(systemName: "xmark")
-                                .foregroundColor(.black)
-                                .font(.system(size: 18, weight: .bold))
-                        }
+                        Image("close")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(.black)
+                            .offset(y:-15)
+                            .offset(x:-12.5)
                     }
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.top, 20)
-            .padding(.bottom, 15)
             
-            // Sprite grid (matching egg style)
             ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(sprites) { sprite in
-                        VStack(spacing: 6) {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .frame(width: 120, height: 120)
-                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+                    ForEach(Array(sprites.enumerated()), id: \.element.id) { index, sprite in
+                        VStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(hex: "F2EDE7"))
+                                .frame(width: 110, height: 110)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                                 .overlay(
                                     Image(sprite.imageName)
                                         .resizable()
@@ -621,20 +630,36 @@ struct SpriteCollectionView: View {
                                 )
                             
                             Text(sprite.name)
-                                .font(.custom("Sarabun-Regular", size: 20))
+                                .font(.custom("Moulpali-Regular", size: 26))
                                 .foregroundColor(.black)
+                                .offset(y:-30)
                             
                             Text(sprite.rarity)
-                                .font(.custom("Sarabun-Regular", size: 14))
+                                .font(.custom("VictorMono-Regular", size: 16))
                                 .foregroundColor(Color(hex: sprite.colorHex))
+                                .offset(y:-45)
                         }
+                        .offset(x: index % 2 == 0 ? 10 : -10)
+                        .padding(.top, {
+                            switch index {
+                            case 0, 1:
+                                0
+                            case 2, 3:
+                                -30
+                            case 4, 5:
+                                -30
+                            case 6, 7:
+                                -30
+                            default:
+                                -30
+                            }
+                        }())
                     }
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.vertical, 15)
+            .padding(.top, -70)
         }
-        .frame(width: 320, height: 640)
+        .frame(width: 340, height: 660)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(hex: "EBE3D7"))
@@ -643,74 +668,79 @@ struct SpriteCollectionView: View {
     }
 }
 
-
-
 struct EggCollectionView: View {
     @Binding var isPresented: Bool
     let eggs: [Egg]
-
+    
     var body: some View {
-        VStack(spacing: 0) {
-            // Header with title and close button
+        VStack {
             ZStack {
                 Text("Eggs")
-                    .font(.custom("Moulpali-Regular", size: 36))
+                    .font(.custom("Moulpali-Regular", size: 40))
                     .foregroundColor(.black)
-
+                    .offset(y:-10)
                 HStack {
                     Spacer()
                     Button {
                         isPresented = false
                     } label: {
-                        ZStack {
-                            Circle()
-                                .fill(Color.white)
-                                .frame(width: 35, height: 35)
-                            Circle()
-                                .stroke(Color.black, lineWidth: 3)
-                                .frame(width: 35, height: 35)
-                            Image(systemName: "xmark")
-                                .foregroundColor(.black)
-                                .font(.system(size: 18, weight: .bold))
-                        }
+                        Image("close")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(.black)
+                            .offset(y:-15)
+                            .offset(x:-12.5)
                     }
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.top, 20)
-            .padding(.bottom, 15)
-
-            // Egg grid
+            
             ScrollView {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16) {
-                    ForEach(eggs) { egg in
-                        VStack(spacing: 6) {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white)
-                                .frame(width: 120, height: 120)
-                                .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 2)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())]) {
+                    ForEach(Array(eggs.enumerated()), id: \.element.id) { index, egg in
+                        VStack {
+                            RoundedRectangle(cornerRadius: 20)
+                                .fill(Color(hex: "F2EDE7"))
+                                .frame(width: 110, height: 110)
+                                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                                 .overlay(
                                     Image(egg.imageName)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 95, height: 95)
                                 )
-
+                            
                             Text(egg.name)
-                                .font(.custom("Sarabun-Regular", size: 20))
+                                .font(.custom("Moulpali-Regular", size: 26))
                                 .foregroundColor(.black)
-
+                                .offset(y:-30)
+                            
                             Text(egg.rarity)
-                                .font(.custom("Sarabun-Regular", size: 14))
+                                .font(.custom("VictorMono-Regular", size: 16))
                                 .foregroundColor(Color(hex: egg.colorHex))
+                                .offset(y:-45)
                         }
+                        .offset(x: index % 2 == 0 ? 10 : -10)
+                        .padding(.top, {
+                            switch index {
+                            case 0, 1:
+                                0
+                            case 2, 3:
+                                -30
+                            case 4, 5:
+                                -30
+                            case 6, 7:
+                                -30
+                            default:
+                                -30
+                            }
+                        }())
                     }
                 }
-                .padding(.horizontal, 20)
             }
-            .padding(.vertical, 15)
+            .padding(.top, -70)
         }
-        .frame(width: 320, height: 640)
+        .frame(width: 340, height: 660)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color(hex: "EBE3D7"))
