@@ -59,7 +59,7 @@ struct InventoryView: View {
                             .padding(.leading, 15)
                             Image("egg")
                                 .offset(y: -40)
-                            Text("Epic Egg")
+                            Text("Plain Egg")
                             .font(.custom("Moulpali-Regular", size: 35))
                             .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                             .offset(y: -85)

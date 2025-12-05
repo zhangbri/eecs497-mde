@@ -15,7 +15,7 @@ struct ScreenTimeApp: App {
     init() {
         #if DEBUG
 
-        UserDefaults.standard.set(9999, forKey: "coins")
+        UserDefaults.standard.set(9000, forKey: "coins")
         #endif
     }
     

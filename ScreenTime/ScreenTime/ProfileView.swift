@@ -13,7 +13,7 @@ struct ProfileView: View {
     private let gridCols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     @AppStorage("coins") private var coins: Int = 0
     private let barHeight: CGFloat = 78
-
+    
     @AppStorage("profile_name") private var name: String = ""
     @AppStorage("profile_username") private var username: String = ""
     @AppStorage("profile_pronouns") private var pronouns: String = ""
@@ -21,9 +21,17 @@ struct ProfileView: View {
     @State private var profileImage: UIImage?
     @State private var selectedItem: PhotosPickerItem?
     
-    @State private var totalCompletedSessions: Int = 0
-    @State private var Averagesessiontime: Int = 0
-    @State private var Longestsession: Int = 0
+    @AppStorage("stats_total_sessions") private var totalCompletedSessions: Int = 0
+    @AppStorage("stats_total_minutes") private var totalSessionMinutes: Int = 0
+    @AppStorage("stats_longest_minutes") private var longestSessionMinutes: Int = 0
+
+    private var averageSessionMinutes: String {
+        guard totalCompletedSessions > 0 else { return "0.00" }
+        let avg = Double(totalSessionMinutes) / Double(totalCompletedSessions)
+        return String(format: "%.2f", avg)
+    }
+
+
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -168,7 +176,7 @@ struct ProfileView: View {
                                         
                                         Text("\(totalCompletedSessions) sessions")
                                             .font(.custom("Sarabun-Regular", size: 20))
-                                            .offset(x: 40)
+                                            .offset(x: 41)
                                         
                                     }
                                     .frame(height: 30)
@@ -179,8 +187,8 @@ struct ProfileView: View {
                                         .frame(height: 1.5)
                                     HStack {
                                         Text("Average session time").font(.custom("Sarabun-Bold", size: 20))
-                                            .padding(.leading, -102.5)
-                                        Text("\(Averagesessiontime) minutes")
+                                            .padding(.leading, -77)
+                                        Text("\(averageSessionMinutes) minutes")
                                             .font(.custom("Sarabun-Regular", size: 20))
                                             .offset(x: 77)
                                         
@@ -193,7 +201,7 @@ struct ProfileView: View {
                                     HStack {
                                         Text("Longest Session").font(.custom("Sarabun-Bold", size: 20))
                                             .padding(.leading, -148)
-                                        Text("\(Longestsession) sessions")
+                                        Text("\(longestSessionMinutes) minutes")
                                             .font(.custom("Sarabun-Regular", size: 20))
                                             .offset(x: 121)
                                     }

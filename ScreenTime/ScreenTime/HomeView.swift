@@ -30,6 +30,10 @@ struct HomeView: View {
 
     @State private var showSession = false
     @State private var sessionLengthSeconds = 0
+    
+    @AppStorage("stats_total_sessions") private var statsTotalSessions: Int = 0
+    @AppStorage("stats_total_minutes") private var statsTotalMinutes: Int = 0
+    @AppStorage("stats_longest_minutes") private var statsLongestMinutes: Int = 0
 
     var body: some View {
         GeometryReader { proxy in
@@ -214,7 +218,18 @@ struct HomeView: View {
             SessionView(totalSeconds: sessionLengthSeconds) { didComplete, secondsEarned in
                 showSession = false
                 if didComplete {
+                    // update total "hours saved" on Home
                     elapsedSeconds += secondsEarned
+                    
+                    // convert to minutes for stats
+                    let minutes = max(secondsEarned / 60, 1)
+                    
+                    // update stats
+                    statsTotalSessions += 1
+                    statsTotalMinutes += minutes
+                    if minutes > statsLongestMinutes {
+                        statsLongestMinutes = minutes
+                    }
                 }
             }
         }

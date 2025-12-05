@@ -131,7 +131,7 @@ struct FriendsView: View {
                 VStack(spacing: 25) {
                     if friends.isEmpty && !isLoading {
                         Text("No friends yet. Add some!")
-                            .font(.custom("Moulpali-Regular", size: 18))
+                            .font(.custom("Moulpali-Regular", size: 20))
                     } else {
                         ForEach(friends) { friend in
                             FriendRowView(
@@ -149,7 +149,7 @@ struct FriendsView: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 375)
-            .offset(y: -135)
+            .offset(y: -150)
         }
     }
     
@@ -431,9 +431,9 @@ struct AddFriendsPopup: View {
                         .foregroundColor(.black)
                         .offset(y: 85)
                     
-                    TextField("Friend email (for demo)", text: $searchText)
+                    TextField("Username, phone number, or email", text: $searchText)
                         .padding(.horizontal, 16)
-                        .frame(width: 280, height: 40)
+                        .frame(width: 320, height: 40)
                         .foregroundColor(Color(hex: "2596be"))
                         .font(.custom("Moulpali-Regular", size: 16))
                         .background(
@@ -453,46 +453,55 @@ struct AddFriendsPopup: View {
                         .foregroundColor(.black)
                         .padding(.bottom, 225)
                     
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color(hex: "F2EDE7"))
-                        .frame(width: 300, height: 70)
-                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
-                        .overlay(
-                            HStack {
-                                Image(systemName: "person.circle.fill")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 46, height: 46)
-                                    .foregroundColor(Color(hex: "FFFFFF"))
-                                    .padding(.leading, 16)
-                                
-                                VStack (alignment: .leading){
-                                    Text(searchText.isEmpty ? "User" : usernameFromEmail(searchText))
-                                        .font(.custom("Moulpali-Regular", size: 26))
-                                        .foregroundColor(.black)
-                                    
-                                    Text(searchText.isEmpty ? "@User" : searchText)
-                                        .font(.custom("Sarabun-Light", size: 15))
-                                        .foregroundColor(.black)
-                                        .offset(y: -12)
-                                }
-                                .offset(y: -2)
-                                
-                                Spacer()
-                                
-                                Button {
-                                    isAdded.toggle()
-                                    onAddFriend(searchText)
-                                } label: {
-                                    Image(isAdded ? "addedfriend" : "addfriend")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 32, height: 32)
-                                        .padding(.trailing, 17.5)
-                                }
-                            }
-                        )
-                        .padding(.top, -245)
+                    VStack(spacing: 5) {
+                        Text("No friend requests at this time.")
+                        Text("Add more friends!")
+                    }
+                    .font(.custom("Sarabun-Light", size: 15))
+                    .foregroundColor(.black)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, -245)
+                    
+//                    RoundedRectangle(cornerRadius: 10)
+//                        .fill(Color(hex: "F2EDE7"))
+//                        .frame(width: 300, height: 70)
+//                        .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
+//                        .overlay(
+//                            HStack {
+//                                Image(systemName: "person.circle.fill")
+//                                    .resizable()
+//                                    .scaledToFit()
+//                                    .frame(width: 46, height: 46)
+//                                    .foregroundColor(Color(hex: "FFFFFF"))
+//                                    .padding(.leading, 16)
+//                                
+//                                VStack (alignment: .leading){
+//                                    Text(searchText.isEmpty ? "User" : usernameFromEmail(searchText))
+//                                        .font(.custom("Moulpali-Regular", size: 26))
+//                                        .foregroundColor(.black)
+//                                    
+//                                    Text(searchText.isEmpty ? "@User" : searchText)
+//                                        .font(.custom("Sarabun-Light", size: 15))
+//                                        .foregroundColor(.black)
+//                                        .offset(y: -12)
+//                                }
+//                                .offset(y: -2)
+//                                
+//                                Spacer()
+//                                
+//                                Button {
+//                                    isAdded.toggle()
+//                                    onAddFriend(searchText)
+//                                } label: {
+//                                    Image(isAdded ? "addedfriend" : "addfriend")
+//                                        .resizable()
+//                                        .scaledToFit()
+//                                        .frame(width: 32, height: 32)
+//                                        .padding(.trailing, 17.5)
+//                                }
+//                            }
+//                        )
+//                        .padding(.top, -245)
                 }
             }
         }
