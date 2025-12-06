@@ -70,6 +70,31 @@ let allSprites: [Sprite] = [
     .init(name: "Siamese",       rarity: "Legendary",   colorHex: "D4A017", imageName: "siamese cat")
 ]
 
+let rarityWeights: [String: Double] = [
+    "Common": 60,
+    "Uncommon": 23,
+    "Rare": 10,
+    "Epic": 5,
+    "Legendary": 2
+]
+
+func weightedRandom<T>(_ items: [(value: T, weight: Double)]) -> T? {
+    let totalWeight = items.reduce(0) { $0 + $1.weight }
+    guard totalWeight > 0 else { return nil }
+    
+    let random = Double.random(in: 0..<totalWeight)
+    var running: Double = 0
+    
+    for (value, weight) in items {
+        running += weight
+        if random < running {
+            return value
+        }
+    }
+    
+    return items.last?.value
+}
+
 struct GachaView: View {
     @EnvironmentObject private var router: TabRouter
     @EnvironmentObject private var inventory: InventoryModel
@@ -175,11 +200,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(50), let accessory = allAccessories.randomElement() {
-                                                                        inventory.add(accessory: accessory)
-                                                                        rolledAccessory = accessory
-                                                                        showAccessoryResult = true
-                                                                    }
+                                                                rollAccessoryOnce()
                                                             }) {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -208,19 +229,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(500) {
-                                                                    var pulled: [Accessory] = []
-
-                                                                    for _ in 0..<5 {
-                                                                        if let accessory = allAccessories.randomElement() {
-                                                                            _ = inventory.add(accessory: accessory)
-                                                                            pulled.append(accessory)
-                                                                        }
-                                                                    }
-
-                                                                    rolledAccessoryBatch = pulled
-                                                                    showAccessoryBatchResult = true
-                                                                }
+                                                                rollAccessoryBatch()
                                                             }) {
                                                                 Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -289,12 +298,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(30),
-                                                                   let egg = allEggs.randomElement() {
-                                                                    _ = inventory.add(egg: egg)
-                                                                    rolledEgg = egg
-                                                                    showEggResult = true
-                                                                }
+                                                                rollEggOnce()
                                                             }) {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -323,19 +327,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(300) {
-                                                                    var pulled: [Egg] = []
-
-                                                                    for _ in 0..<5 {
-                                                                        if let egg = allEggs.randomElement() {
-                                                                            _ = inventory.add(egg: egg)
-                                                                            pulled.append(egg)
-                                                                        }
-                                                                    }
-
-                                                                    rolledEggBatch = pulled
-                                                                    showEggBatchResult = true
-                                                                }
+                                                                rollEggBatch()
                                                             }) {
                                                                 Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -404,12 +396,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(60),
-                                                                   let sprite = allSprites.randomElement() {
-                                                                    _ = inventory.add(sprite: sprite)
-                                                                    rolledSprite = sprite
-                                                                    showSpriteResult = true
-                                                                }
+                                                                rollSpriteOnce()
                                                             }) {
                                                                 Text("1x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -438,19 +425,7 @@ struct GachaView: View {
 
                                                         ZStack{
                                                             Button(action: {
-                                                                if spendCoins(600) {
-                                                                    var pulled: [Sprite] = []
-
-                                                                    for _ in 0..<5 {
-                                                                        if let sprite = allSprites.randomElement() {
-                                                                            _ = inventory.add(sprite: sprite)
-                                                                            pulled.append(sprite)
-                                                                        }
-                                                                    }
-
-                                                                    rolledSpriteBatch = pulled
-                                                                    showSpriteBatchResult = true
-                                                                }
+                                                                rollSpriteBatch()
                                                             }) {
                                                                 Text("5x Roll")
                                                                     .font(.custom("Moulpali-Regular", size: 16))
@@ -494,37 +469,49 @@ struct GachaView: View {
                         .ignoresSafeArea(edges: .bottom)
                         .offset(y: 34)
                 }
-                .fullScreenCover(isPresented: $showResult) {
-                    GachaResultView()
-                }
+
                 .fullScreenCover(isPresented: $showAccessoryResult) {
                     if let rolledAccessory {
-                        AccessoryResultView(accessory: rolledAccessory)
+                        AccessoryResultView(accessory: rolledAccessory) {
+                            rollAccessoryOnce()
+                        }
                     }
                 }
+
                 .fullScreenCover(isPresented: $showEggResult) {
                     if let rolledEgg {
-                        EggResultView(egg: rolledEgg)
+                        EggResultView(egg: rolledEgg) {
+                            rollEggOnce()
+                        }
                     }
                 }
+
                 .fullScreenCover(isPresented: $showSpriteResult) {
                     if let rolledSprite {
-                        SpriteResultView(sprite: rolledSprite)
+                        SpriteResultView(sprite: rolledSprite) {
+                            rollSpriteOnce()
+                        }
                     }
                 }
                 .fullScreenCover(isPresented: $showAccessoryBatchResult) {
                     if !rolledAccessoryBatch.isEmpty {
-                        AccessoryBatchResultView(accessories: rolledAccessoryBatch)
+                        AccessoryBatchResultView(accessories: rolledAccessoryBatch) {
+                            rollAccessoryBatch()
+                        }
                     }
                 }
                 .fullScreenCover(isPresented: $showEggBatchResult) {
                     if !rolledEggBatch.isEmpty {
-                        EggBatchResultView(eggs: rolledEggBatch)
+                        EggBatchResultView(eggs: rolledEggBatch) {
+                            rollEggBatch()
+                        }
                     }
                 }
                 .fullScreenCover(isPresented: $showSpriteBatchResult) {
                     if !rolledSpriteBatch.isEmpty {
-                        SpriteBatchResultView(sprites: rolledSpriteBatch)
+                        SpriteBatchResultView(sprites: rolledSpriteBatch) {
+                            rollSpriteBatch()
+                        }
                     }
                 }
                 .overlay(
@@ -567,6 +554,126 @@ struct GachaView: View {
                 )
             }
         }
+
+    private func rollAccessoryOnce() {
+        if spendCoins(50), let accessory = rollAccessoryWithRarity() {
+            inventory.add(accessory: accessory)
+            rolledAccessory = accessory
+            showAccessoryResult = true
+        }
+    }
+
+    private func rollAccessoryBatch() {
+        if spendCoins(500) {
+            var pulled: [Accessory] = []
+            for _ in 0..<5 {
+                if let accessory = rollAccessoryWithRarity(){
+                    inventory.add(accessory: accessory)
+                    pulled.append(accessory)
+                }
+            }
+            rolledAccessoryBatch = pulled
+            showAccessoryBatchResult = true
+        }
+    }
+
+    private func rollEggOnce() {
+        if spendCoins(30), let egg = rollEggWithRarity() {
+            inventory.add(egg: egg)
+            rolledEgg = egg
+            showEggResult = true
+        }
+    }
+
+    private func rollEggBatch() {
+        if spendCoins(300) {
+            var pulled: [Egg] = []
+            for _ in 0..<5 {
+                if let egg = rollEggWithRarity() {
+                    inventory.add(egg: egg)
+                    pulled.append(egg)
+                }
+            }
+            rolledEggBatch = pulled
+            showEggBatchResult = true
+        }
+    }
+
+    private func rollSpriteOnce() {
+        if spendCoins(60), let sprite = rollSpriteWithRarity() {
+            inventory.add(sprite: sprite)
+            rolledSprite = sprite
+            showSpriteResult = true
+        }
+    }
+
+    private func rollSpriteBatch() {
+        if spendCoins(600) {
+            var pulled: [Sprite] = []
+            for _ in 0..<5 {
+                if let sprite = rollSpriteWithRarity() {
+                    inventory.add(sprite: sprite)
+                    pulled.append(sprite)
+                }
+            }
+            rolledSpriteBatch = pulled
+            showSpriteBatchResult = true
+        }
+    }
+    
+    // MARK: - Rarity-based roll helpers
+
+    private func rollAccessoryWithRarity() -> Accessory? {
+        let grouped = Dictionary(grouping: allAccessories, by: { $0.rarity })
+        
+        let rarityWeightPairs: [(value: String, weight: Double)] = grouped.compactMap { (rarity, items) in
+            guard !items.isEmpty, let weight = rarityWeights[rarity] else { return nil }
+            return (value: rarity, weight: weight)
+        }
+        
+        guard let chosenRarity = weightedRandom(rarityWeightPairs),
+              let pool = grouped[chosenRarity],
+              let accessory = pool.randomElement() else {
+            return nil
+        }
+        
+        return accessory
+    }
+
+    private func rollEggWithRarity() -> Egg? {
+        let grouped = Dictionary(grouping: allEggs, by: { $0.rarity })
+        
+        let rarityWeightPairs: [(value: String, weight: Double)] = grouped.compactMap { (rarity, items) in
+            guard !items.isEmpty, let weight = rarityWeights[rarity] else { return nil }
+            return (value: rarity, weight: weight)
+        }
+        
+        guard let chosenRarity = weightedRandom(rarityWeightPairs),
+              let pool = grouped[chosenRarity],
+              let egg = pool.randomElement() else {
+            return nil
+        }
+        
+        return egg
+    }
+
+    private func rollSpriteWithRarity() -> Sprite? {
+        let grouped = Dictionary(grouping: allSprites, by: { $0.rarity })
+        
+        let rarityWeightPairs: [(value: String, weight: Double)] = grouped.compactMap { (rarity, items) in
+            guard !items.isEmpty, let weight = rarityWeights[rarity] else { return nil }
+            return (value: rarity, weight: weight)
+        }
+        
+        guard let chosenRarity = weightedRandom(rarityWeightPairs),
+              let pool = grouped[chosenRarity],
+              let sprite = pool.randomElement() else {
+            return nil
+        }
+        
+        return sprite
+    }
+
     @discardableResult
     private func spendCoins(_ cost: Int) -> Bool {
         guard coins >= cost else {
@@ -820,115 +927,10 @@ struct EggCollectionView: View {
     }
 }
 
-struct GachaResultView: View {
-    @Environment(\.dismiss) private var dismiss
-    var body: some View {
-        ZStack {
-            Color(hex: "EBE3D7").ignoresSafeArea()
-            
-            VStack {
-                HStack {
-                    Image("logo")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 49)
-                    Text("pawse")
-                        .font(.custom("VictorMono-Regular", size: 30))
-                        .foregroundColor(.black)
-                    Spacer()
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        ZStack {
-                            Circle()
-                                .stroke(Color.black, lineWidth: 4)
-                                .frame(width: 40, height: 40)
-                            Image(systemName: "xmark")
-                                .foregroundColor(.black)
-                                .font(.system(size:25, weight: .bold))
-                        }
-                        .offset(y: 35)
-                        .offset(x: -12.5)
-                    }
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 12)
-                
-                Spacer()
-                
-                Image("orangetabby")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 318, height: 318)
-                    .offset(y: -30)
-                
-                VStack {
-                    Text("you unlocked")
-                        .font(.custom("Sarabun-Regular", size: 30))
-                        .foregroundColor(.black)
-                        .offset(y: -45)
-                    
-                    Text("RARE")
-                        .font(.custom("VictorMono-Regular", size: 40))
-                        .foregroundColor(Color(hex: "E62222"))
-                        .shadow(color: Color(hex: "E62222"), radius: 4, x: 0, y: 1)
-                        .offset(y: -40)
-                    
-                    Text("Orange Tabby")
-                        .font(.custom("Sarabun-Regular", size: 50))
-                        .foregroundColor(.black)
-                        .offset(y: -55)
-                    }
-                
-                VStack {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Equip Now")
-                            .font(.custom("Moulpali-Regular", size: 30))
-                            .foregroundColor(.black)
-                            .frame(width: 245, height: 53)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
-                            .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "F273E9"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    .offset(y: 10)
-                }
-                .offset(y: -55)
-                
-                Spacer()
-            }
-        }
-    }
-}
-
 struct AccessoryResultView: View {
     @Environment(\.dismiss) private var dismiss
     let accessory: Accessory
+    let onRollAgain: () -> Void
     
     var body: some View {
         ZStack {
@@ -994,30 +996,13 @@ struct AccessoryResultView: View {
                 
                 VStack {
                     Button {
-                        // hook up equip logic here later
                         dismiss()
+                        onRollAgain()
                     } label: {
-                        Text("Equip Now")
+                        Text("Roll again")
                             .font(.custom("Moulpali-Regular", size: 24))
                             .foregroundColor(.black)
                             .frame(width: 220, height: 50)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
-                            .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(hex: "F273E9"))
@@ -1027,7 +1012,6 @@ struct AccessoryResultView: View {
                                             y: 2)
                             )
                     }
-                    .offset(y: 10)
                 }
                 .offset(y: -35)
                 
@@ -1040,6 +1024,7 @@ struct AccessoryResultView: View {
 struct EggResultView: View {
     @Environment(\.dismiss) private var dismiss
     let egg: Egg
+    let onRollAgain: () -> Void
     
     var body: some View {
         ZStack {
@@ -1079,7 +1064,7 @@ struct EggResultView: View {
                 Image(egg.imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 260, height: 260)
+                    .frame(width: 250, height: 250)
                     .offset(y: -20)
                 
                 VStack {
@@ -1105,30 +1090,13 @@ struct EggResultView: View {
                 
                 VStack {
                     Button {
-                        // Equip egg logic later if you have one
                         dismiss()
+                        onRollAgain()
                     } label: {
-                        Text("Equip Now")
+                        Text("Roll again")
                             .font(.custom("Moulpali-Regular", size: 24))
                             .foregroundColor(.black)
                             .frame(width: 220, height: 50)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
-                            .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(hex: "F273E9"))
@@ -1138,7 +1106,6 @@ struct EggResultView: View {
                                             y: 2)
                             )
                     }
-                    .offset(y: 10)
                 }
                 .offset(y: -35)
                 
@@ -1151,6 +1118,7 @@ struct EggResultView: View {
 struct SpriteResultView: View {
     @Environment(\.dismiss) private var dismiss
     let sprite: Sprite
+    let onRollAgain: () -> Void
     
     var body: some View {
         ZStack {
@@ -1190,56 +1158,39 @@ struct SpriteResultView: View {
                 Image(sprite.imageName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 318, height: 318)
-                    .offset(y: -30)
+                    .frame(width: 250, height: 250)
+                    .offset(y: -20)
                 
                 VStack {
                     Text("you unlocked")
                         .font(.custom("Sarabun-Regular", size: 30))
                         .foregroundColor(.black)
-                        .offset(y: -45)
+                        .offset(y: -30)
                     
                     Text(sprite.rarity.uppercased())
-                        .font(.custom("VictorMono-Regular", size: 40))
+                        .font(.custom("VictorMono-Regular", size: 32))
                         .foregroundColor(Color(hex: sprite.colorHex))
                         .shadow(color: Color(hex: sprite.colorHex),
                                 radius: 4,
                                 x: 0,
                                 y: 1)
-                        .offset(y: -40)
+                        .offset(y: -25)
                     
                     Text(sprite.name)
-                        .font(.custom("Sarabun-Regular", size: 50))
+                        .font(.custom("Sarabun-Regular", size: 40))
                         .foregroundColor(.black)
-                        .offset(y: -55)
+                        .offset(y: -35)
                 }
                 
                 VStack {
                     Button {
-                        // hook up sprite equip logic here later
                         dismiss()
-                    } label: {
-                        Text("Equip Now")
-                            .font(.custom("Moulpali-Regular", size: 30))
-                            .foregroundColor(.black)
-                            .frame(width: 245, height: 53)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    Button {
-                        dismiss()
+                        onRollAgain()
                     } label: {
                         Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
+                            .font(.custom("Moulpali-Regular", size: 24))
                             .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
+                            .frame(width: 220, height: 50)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(hex: "F273E9"))
@@ -1249,9 +1200,8 @@ struct SpriteResultView: View {
                                             y: 2)
                             )
                     }
-                    .offset(y: 10)
                 }
-                .offset(y: -55)
+                .offset(y: -35)
                 
                 Spacer()
             }
@@ -1262,6 +1212,7 @@ struct AccessoryBatchResultView: View {
     @Environment(\.dismiss) private var dismiss
     let accessories: [Accessory]
     @State private var currentIndex: Int = 0
+    let onRollAgain: () -> Void
     
     var body: some View {
         let accessory = accessories[currentIndex]
@@ -1270,7 +1221,6 @@ struct AccessoryBatchResultView: View {
             Color(hex: "EBE3D7").ignoresSafeArea()
             
             VStack {
-                // === HEADER (unchanged) ===
                 HStack {
                     Image("logo")
                         .resizable()
@@ -1301,7 +1251,6 @@ struct AccessoryBatchResultView: View {
                 
                 Spacer()
                 
-                // === IMAGE + ARROWS (only new part) ===
                 HStack {
                     if currentIndex > 0 {
                         Button {
@@ -1310,18 +1259,18 @@ struct AccessoryBatchResultView: View {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 50, weight: .bold))
                                 .foregroundColor(.black)
-                                .offset(y: -15)
+                                .offset(y: 15)
+                                .offset(x: -16)
                         }
-                        .padding(.leading, 8)
                     } else {
-                        Spacer().frame(width: 32)
+                        Spacer().frame(width: 40)
                     }
                     
                     Image(accessory.imageName)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 250, height: 250)
-                        .offset(y: -20)
+                        .offset(y: 12)
                     
                     if currentIndex < accessories.count - 1 {
                         Button {
@@ -1330,21 +1279,19 @@ struct AccessoryBatchResultView: View {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 50, weight: .bold))
                                 .foregroundColor(.black)
-                                .offset(y: -15)
+                                .offset(y: 15)
+                                .offset(x: 16)
                         }
-                        .padding(.leading, 8)
                     } else {
-                        Spacer().frame(width: 32)
+                        Spacer().frame(width: 40)
                     }
                 }
-                .padding(.horizontal, 24)
-                
-                // === TEXT (same as original + counter) ===
+
                 VStack {
                     Text("you unlocked")
                         .font(.custom("Sarabun-Regular", size: 30))
                         .foregroundColor(.black)
-                        .offset(y: -30)
+                        .offset(y: 2)
                     
                     Text(accessory.rarity.uppercased())
                         .font(.custom("VictorMono-Regular", size: 32))
@@ -1353,47 +1300,26 @@ struct AccessoryBatchResultView: View {
                                 radius: 4,
                                 x: 0,
                                 y: 1)
-                        .offset(y: -25)
+                        .offset(y: 8)
                     
                     Text(accessory.name)
                         .font(.custom("Sarabun-Regular", size: 40))
                         .foregroundColor(.black)
-                        .offset(y: -35)
-                    
-                    // small 1/5 label under name
-                    Text("\(currentIndex + 1)/\(accessories.count)")
-                        .font(.custom("Sarabun-Regular", size: 18))
-                        .foregroundColor(.black.opacity(0.7))
-                        .offset(y: -30)
+                        .offset(y: -3)
                 }
+                Text("\(currentIndex + 1)/\(accessories.count)")
+                    .font(.custom("Sarabun-Regular", size: 50))
+                    .offset(y: -475)
                 
-                // === BUTTONS (unchanged layout) ===
                 VStack {
                     Button {
-                        // hook up equip logic later if you want
                         dismiss()
+                        onRollAgain()
                     } label: {
-                        Text("Equip Now")
+                        Text("Roll again")
                             .font(.custom("Moulpali-Regular", size: 24))
                             .foregroundColor(.black)
                             .frame(width: 220, height: 50)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
-                            .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(hex: "F273E9"))
@@ -1403,9 +1329,8 @@ struct AccessoryBatchResultView: View {
                                             y: 2)
                             )
                     }
-                    .offset(y: 10)
                 }
-                .offset(y: -35)
+                .offset(y: -68)
                 
                 Spacer()
             }
@@ -1417,6 +1342,7 @@ struct EggBatchResultView: View {
     @Environment(\.dismiss) private var dismiss
     let eggs: [Egg]
     @State private var currentIndex: Int = 0
+    let onRollAgain: () -> Void
     
     var body: some View {
         let egg = eggs[currentIndex]
@@ -1425,7 +1351,6 @@ struct EggBatchResultView: View {
             Color(hex: "EBE3D7").ignoresSafeArea()
             
             VStack {
-                // HEADER (unchanged)
                 HStack {
                     Image("logo")
                         .resizable()
@@ -1456,7 +1381,6 @@ struct EggBatchResultView: View {
                 
                 Spacer()
                 
-                // IMAGE + ARROWS
                 HStack {
                     if currentIndex > 0 {
                         Button {
@@ -1465,18 +1389,18 @@ struct EggBatchResultView: View {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 50, weight: .bold))
                                 .foregroundColor(.black)
-                                .offset(y: -15)
+                                .offset(y: 15)
+                                .offset(x: -16)
                         }
-                        .padding(.leading, 8)
                     } else {
-                        Spacer().frame(width: 32)
+                        Spacer().frame(width: 40)
                     }
                     
                     Image(egg.imageName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 260, height: 260)
-                        .offset(y: -20)
+                        .frame(width: 250, height: 250)
+                        .offset(y: 12)
                     
                     if currentIndex < eggs.count - 1 {
                         Button {
@@ -1485,21 +1409,19 @@ struct EggBatchResultView: View {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 50, weight: .bold))
                                 .foregroundColor(.black)
-                                .offset(y: -15)
+                                .offset(y: 15)
+                                .offset(x: 16)
                         }
-                        .padding(.leading, 8)
                     } else {
-                        Spacer().frame(width: 32)
+                        Spacer().frame(width: 40)
                     }
                 }
-                .padding(.horizontal, 24)
                 
-                // TEXT (same + counter)
                 VStack {
                     Text("you hatched")
                         .font(.custom("Sarabun-Regular", size: 30))
                         .foregroundColor(.black)
-                        .offset(y: -30)
+                        .offset(y: 2)
                     
                     Text(egg.rarity.uppercased())
                         .font(.custom("VictorMono-Regular", size: 32))
@@ -1508,46 +1430,27 @@ struct EggBatchResultView: View {
                                 radius: 4,
                                 x: 0,
                                 y: 1)
-                        .offset(y: -25)
+                        .offset(y: 8)
                     
                     Text("\(egg.name) Egg")
                         .font(.custom("Sarabun-Regular", size: 40))
                         .foregroundColor(.black)
-                        .offset(y: -35)
+                        .offset(y: 3)
                     
                     Text("\(currentIndex + 1)/\(eggs.count)")
-                        .font(.custom("Sarabun-Regular", size: 18))
-                        .foregroundColor(.black.opacity(0.7))
-                        .offset(y: -30)
+                        .font(.custom("Sarabun-Regular", size: 50))
+                        .offset(y: -475)
                 }
                 
-                // BUTTONS (unchanged)
                 VStack {
                     Button {
-                        // equip egg later
                         dismiss()
+                        onRollAgain()
                     } label: {
-                        Text("Equip Now")
+                        Text("Roll again")
                             .font(.custom("Moulpali-Regular", size: 24))
                             .foregroundColor(.black)
                             .frame(width: 220, height: 50)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    Button {
-                        dismiss()
-                    } label: {
-                        Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
-                            .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(hex: "F273E9"))
@@ -1557,9 +1460,8 @@ struct EggBatchResultView: View {
                                             y: 2)
                             )
                     }
-                    .offset(y: 10)
                 }
-                .offset(y: -35)
+                .offset(y: -68)
                 
                 Spacer()
             }
@@ -1570,7 +1472,8 @@ struct SpriteBatchResultView: View {
     @Environment(\.dismiss) private var dismiss
     let sprites: [Sprite]
     @State private var currentIndex: Int = 0
-    
+    let onRollAgain: () -> Void
+
     var body: some View {
         let sprite = sprites[currentIndex]
         
@@ -1578,7 +1481,6 @@ struct SpriteBatchResultView: View {
             Color(hex: "EBE3D7").ignoresSafeArea()
             
             VStack {
-                // HEADER (unchanged)
                 HStack {
                     Image("logo")
                         .resizable()
@@ -1609,7 +1511,6 @@ struct SpriteBatchResultView: View {
                 
                 Spacer()
                 
-                // IMAGE + ARROWS
                 HStack {
                     if currentIndex > 0 {
                         Button {
@@ -1618,18 +1519,18 @@ struct SpriteBatchResultView: View {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 50, weight: .bold))
                                 .foregroundColor(.black)
-                                .offset(y: -15)
+                                .offset(y: 15)
+                                .offset(x: -16)
                         }
-                        .padding(.leading, 8)
                     } else {
-                        Spacer().frame(width: 32)
+                        Spacer().frame(width: 40)
                     }
                     
                     Image(sprite.imageName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 318, height: 318)
-                        .offset(y: -30)
+                        .frame(width: 250, height: 250)
+                        .offset(y: 12)
                     
                     if currentIndex < sprites.count - 1 {
                         Button {
@@ -1638,69 +1539,48 @@ struct SpriteBatchResultView: View {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 50, weight: .bold))
                                 .foregroundColor(.black)
-                                .offset(y: -15)
+                                .offset(y: 15)
+                                .offset(x: 16)
                         }
-                        .padding(.leading, 8)
                     } else {
-                        Spacer().frame(width: 32)
+                        Spacer().frame(width: 40)
                     }
                 }
-                .padding(.horizontal, 24)
                 
-                // TEXT (same + counter)
                 VStack {
                     Text("you unlocked")
                         .font(.custom("Sarabun-Regular", size: 30))
                         .foregroundColor(.black)
-                        .offset(y: -45)
+                        .offset(y: 2)
                     
                     Text(sprite.rarity.uppercased())
-                        .font(.custom("VictorMono-Regular", size: 40))
+                        .font(.custom("VictorMono-Regular", size: 32))
                         .foregroundColor(Color(hex: sprite.colorHex))
                         .shadow(color: Color(hex: sprite.colorHex),
                                 radius: 4,
                                 x: 0,
                                 y: 1)
-                        .offset(y: -40)
+                        .offset(y: 8)
                     
                     Text(sprite.name)
-                        .font(.custom("Sarabun-Regular", size: 50))
+                        .font(.custom("Sarabun-Regular", size: 40))
                         .foregroundColor(.black)
-                        .offset(y: -55)
+                        .offset(y: -3)
                     
                     Text("\(currentIndex + 1)/\(sprites.count)")
-                        .font(.custom("Sarabun-Regular", size: 18))
-                        .foregroundColor(.black.opacity(0.7))
-                        .offset(y: -55)
+                        .font(.custom("Sarabun-Regular", size: 50))
+                        .offset(y: -475)
                 }
                 
-                // BUTTONS (unchanged)
                 VStack {
                     Button {
-                        // equip sprite later
                         dismiss()
-                    } label: {
-                        Text("Equip Now")
-                            .font(.custom("Moulpali-Regular", size: 30))
-                            .foregroundColor(.black)
-                            .frame(width: 245, height: 53)
-                            .background(
-                                RoundedRectangle(cornerRadius: 8)
-                                    .fill(Color(hex: "B2E5AB"))
-                                    .shadow(color: .black.opacity(0.25),
-                                            radius: 4,
-                                            x: 0,
-                                            y: 2)
-                            )
-                    }
-                    
-                    Button {
-                        dismiss()
+                        onRollAgain()
                     } label: {
                         Text("Roll again")
-                            .font(.custom("Moulpali-Regular", size: 15))
+                            .font(.custom("Moulpali-Regular", size: 24))
                             .foregroundColor(.black)
-                            .frame(width: 164, height: 44)
+                            .frame(width: 220, height: 50)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .fill(Color(hex: "F273E9"))
@@ -1710,9 +1590,8 @@ struct SpriteBatchResultView: View {
                                             y: 2)
                             )
                     }
-                    .offset(y: 10)
                 }
-                .offset(y: -55)
+                .offset(y: -68)
                 
                 Spacer()
             }
