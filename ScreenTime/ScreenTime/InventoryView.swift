@@ -15,11 +15,33 @@ struct InventoryView: View {
     @EnvironmentObject private var router: TabRouter
     @EnvironmentObject private var inventory: InventoryModel
     @AppStorage("coins") private var coins: Int = 0
+    @AppStorage("stats_total_minutes") private var totalSessionMinutes: Int = 0
     @State private var invTab: InventoryTab = .sprites
     private let gridCols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
 
     private let barHeight: CGFloat = 78
-    
+    private let hatchGoalMinutes: Int = 120
+
+    private var hatchProgress: Double {
+        guard hatchGoalMinutes > 0 else { return 0 }
+        let raw = Double(totalSessionMinutes) / Double(hatchGoalMinutes)
+        return min(max(raw, 0), 1) // clamp 0...1
+    }
+
+    private var hatchPercentText: String {
+        let percent = Int(hatchProgress * 100)
+        return "\(percent)% hatched"
+    }
+
+    private var hatchRemainingText: String {
+        let remaining = max(hatchGoalMinutes - totalSessionMinutes, 0)
+        if remaining == 0 {
+            return "Egg ready to hatch!"
+        } else {
+            return "\(remaining) session minutes until hatched"
+        }
+    }
+
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .bottom) {
@@ -63,16 +85,25 @@ struct InventoryView: View {
                             .font(.custom("Moulpali-Regular", size: 35))
                             .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 4)
                             .offset(y: -85)
-                            RoundedRectangle(cornerRadius: 100)
-                                .fill(Color(hex: "C4C5C7"))
-                                .frame(width: 300, height: 20)
-                                .offset(y: -155)
-                            Text("0% hatched")
-                            .font(.custom("Sarabun-Medium", size: 25))
-                            .offset(y: -150)
-                            Text("2 session hours until hatched")
-                            .font(.custom("Sarabun-Thin", size: 20))
-                            .offset(y: -145)
+                            // Progress bar: gray background + green fill on top
+                            ZStack(alignment: .leading) {
+                                RoundedRectangle(cornerRadius: 100)
+                                    .fill(Color(hex: "C4C5C7"))
+
+                                RoundedRectangle(cornerRadius: 100)
+                                    .fill(Color(hex: "548777"))
+                                    .frame(width: 300 * CGFloat(hatchProgress))
+                            }
+                            .frame(width: 300, height: 20)
+                            .offset(y: -155)
+
+                            Text(hatchPercentText)
+                                .font(.custom("Sarabun-Medium", size: 25))
+                                .offset(y: -150)
+
+                            Text(hatchRemainingText)
+                                .font(.custom("Sarabun-Thin", size: 20))
+                                .offset(y: -145)
                             
                             ZStack(alignment: .top) {
                                 VStack {

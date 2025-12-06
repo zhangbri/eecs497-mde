@@ -13,6 +13,7 @@ struct ProfileView: View {
     private let gridCols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
     @AppStorage("coins") private var coins: Int = 0
     private let barHeight: CGFloat = 78
+    @EnvironmentObject private var inventory: InventoryModel
     
     @AppStorage("profile_name") private var name: String = ""
     @AppStorage("profile_username") private var username: String = ""
@@ -24,6 +25,46 @@ struct ProfileView: View {
     @AppStorage("stats_total_sessions") private var totalCompletedSessions: Int = 0
     @AppStorage("stats_total_minutes") private var totalSessionMinutes: Int = 0
     @AppStorage("stats_longest_minutes") private var longestSessionMinutes: Int = 0
+
+    private var hasTenSessions: Bool {
+        totalCompletedSessions >= 10
+    }
+
+    private var hasAllSprites: Bool {
+        let ownedNames = Set(inventory.sprites.map { $0.name })
+        let requiredNames = Set(allSprites.map { $0.name })
+        return requiredNames.isSubset(of: ownedNames)
+    }
+
+    private var hasAllEggs: Bool {
+        let ownedNames = Set(inventory.eggs.map { $0.name })
+        let requiredNames = Set(allEggs.map { $0.name })
+        return requiredNames.isSubset(of: ownedNames)
+    }
+
+    private var hasThousandCoins: Bool {
+        coins >= 1000
+    }
+    
+    // MARK: - Dynamic ordered achievements
+    private var unlockedAchievementIcons: [String] {
+        var icons: [String] = []
+        
+        if hasTenSessions {
+            icons.append("10sesh")
+        }
+        if hasAllSprites {
+            icons.append("allsprites")
+        }
+        if hasAllEggs {
+            icons.append("alleggs")
+        }
+        if hasThousandCoins {
+            icons.append("thousand")
+        }
+        
+        return icons
+    }
 
     private var averageSessionMinutes: String {
         guard totalCompletedSessions > 0 else { return "0.00" }
@@ -153,9 +194,7 @@ struct ProfileView: View {
                                     LazyVGrid(columns: gridCols, spacing: 30) {
                                         ForEach(0..<6, id: \.self) { i in
                                             achievementCard {
-                                                Image(systemName: "trophy.fill")
-                                                    .font(.system(size: 45))
-                                                    .foregroundColor(.black.opacity(0.5))
+                                                achievementImage(for: i)
                                             }
                                         }
                                     }
@@ -258,6 +297,24 @@ struct ProfileView: View {
             }
         }
     }
+    @ViewBuilder
+    private func achievementImage(for index: Int) -> some View {
+        if index < unlockedAchievementIcons.count {
+            Image(unlockedAchievementIcons[index])
+                .resizable()
+                .scaledToFit()
+                .padding(14)
+        } else {
+            trophyImage()
+        }
+    }
+
+    @ViewBuilder
+    private func trophyImage() -> some View {
+        Image(systemName: "trophy.fill")
+            .font(.system(size: 45))
+            .foregroundColor(.black.opacity(0.5))
+    }
 }
 @ViewBuilder
 private func achievementCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -269,5 +326,7 @@ private func achievementCard<Content: View>(@ViewBuilder content: () -> Content)
 }
 
 #Preview {
-    ProfileView().environmentObject(TabRouter())
+    ProfileView()
+            .environmentObject(TabRouter())
+            .environmentObject(InventoryModel())
 }
