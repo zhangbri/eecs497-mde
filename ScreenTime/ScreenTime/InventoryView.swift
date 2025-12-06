@@ -16,6 +16,7 @@ struct InventoryView: View {
     @EnvironmentObject private var inventory: InventoryModel
     @AppStorage("coins") private var coins: Int = 0
     @AppStorage("stats_total_minutes") private var totalSessionMinutes: Int = 0
+    
     @State private var invTab: InventoryTab = .sprites
     private let gridCols = [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())]
 
@@ -159,15 +160,13 @@ struct InventoryView: View {
             case .sprites:
                 gridPanel {
                     ForEach(0..<10, id: \.self) { index in
-                        inventoryCard {
-                            if index < inventory.sprites.count {
-                                let sprite = inventory.sprites[index]
-                                Image(sprite.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .padding(14)
-                            } else {
-                                
+                        if index < inventory.sprites.count {
+                            let sprite = inventory.sprites[index]
+                            spriteInventoryCard(sprite: sprite)
+                        } else {
+                            // empty slot
+                            inventoryCard {
+                                EmptyView()
                             }
                         }
                     }
@@ -176,15 +175,12 @@ struct InventoryView: View {
             case .items: // accessories
                 gridPanel {
                     ForEach(0..<10, id: \.self) { index in
-                        inventoryCard {
-                            if index < inventory.accessories.count {
-                                let accessory = inventory.accessories[index]
-                                Image(accessory.imageName)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .padding(14)
-                            } else {
-
+                        if index < inventory.accessories.count {
+                            let accessory = inventory.accessories[index]
+                            accessoryInventoryCard(accessory: accessory)
+                        } else {
+                            inventoryCard {
+                                EmptyView()
                             }
                         }
                     }
@@ -218,7 +214,76 @@ struct InventoryView: View {
             .padding(.horizontal, 10)
       
     }
+    
+    private func spriteInventoryCard(sprite: Sprite) -> some View {
+        ZStack {
+            // Base card with the sprite image
+            inventoryCard {
+                Image(sprite.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(14)
+            }
 
+            // Equip button overlay at the bottom of the card
+            VStack {
+                Spacer()
+                Button {
+                    inventory.equippedSpriteImageName = sprite.imageName
+                } label: {
+                    Text("equip")
+                        .font(.custom("Sarabun-Regular", size: 16))
+                        .foregroundColor(.black)
+                        .frame(width: 80, height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color(hex: "B2E5AB")) // same vibe as your other buttons
+                                .shadow(color: .black.opacity(0.25),
+                                        radius: 2,
+                                        x: 0,
+                                        y: 2)
+                        )
+                }
+                .padding(.bottom, 8)
+            }
+        }
+    }
+    
+    private func accessoryInventoryCard(accessory: Accessory) -> some View {
+        ZStack {
+            // Base card with accessory image
+            inventoryCard {
+                Image(accessory.imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .padding(14)
+            }
+
+            // Equip button overlay at the bottom of the card
+            VStack {
+                Spacer()
+                Button {
+                    inventory.equippedAccessoryImageName = accessory.imageName
+                } label: {
+                    Text("equip")
+                        .font(.custom("Sarabun-Regular", size: 16))
+                        .foregroundColor(.black)
+                        .frame(width: 80, height: 28)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color(hex: "B2E5AB"))
+                                .shadow(color: .black.opacity(0.25),
+                                        radius: 2,
+                                        x: 0,
+                                        y: 2)
+                        )
+                }
+                .padding(.bottom, 8)
+            }
+        }
+    }
+
+    
     private func inventoryCard<Content: View>(@ViewBuilder content: () -> Content) -> some View {
         RoundedRectangle(cornerRadius: 20)
             .fill(Color(hex: "F2EDE7"))

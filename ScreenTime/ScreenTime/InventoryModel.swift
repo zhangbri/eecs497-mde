@@ -12,7 +12,8 @@ final class InventoryModel: ObservableObject {
     @Published var sprites: [Sprite] = []
     @Published var eggs: [Egg] = []
     @Published var accessories: [Accessory] = []
-    
+    @Published var equippedSpriteImageName: String = "graycat"
+    @Published var equippedAccessoryImageName: String? = nil
     // Returns true if added, false if you already had it
     @discardableResult
     func add(sprite: Sprite) -> Bool {

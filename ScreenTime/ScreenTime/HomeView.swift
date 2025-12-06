@@ -30,6 +30,74 @@ struct HomeView: View {
 
     @State private var showSession = false
     @State private var sessionLengthSeconds = 0
+    @EnvironmentObject private var inventory: InventoryModel
+    
+    private struct AccessoryLayout {
+        let offset: CGSize
+        let scale: CGFloat
+        let rotation: Angle
+    }
+
+    // Custom layout per accessory *imageName*
+    private let accessoryLayouts: [String: AccessoryLayout] = [
+        // Neck / chest accessories
+        "bowtie": AccessoryLayout(
+            offset: CGSize(width: 0, height: 33),
+            scale: 0.45,
+            rotation: .degrees(0)
+        ),
+        "tie": AccessoryLayout(
+            offset: CGSize(width: 0, height: 70),
+            scale: 0.45,
+            rotation: .degrees(0)
+        ),
+        "chain": AccessoryLayout(
+            offset: CGSize(width: 0, height: 63),
+            scale: 0.4,
+            rotation: .degrees(0)
+        ),
+
+        // Head-top accessories
+        "chef hat": AccessoryLayout(
+            offset: CGSize(width: 0, height: -160),
+            scale: 0.45,
+            rotation: .degrees(0)
+        ),
+        "top hat": AccessoryLayout(
+            offset: CGSize(width: 5, height: -135),
+            scale: 0.45,
+            rotation: .degrees(3)
+        ),
+        "crown": AccessoryLayout(
+            offset: CGSize(width: 0, height: -137),
+            scale: 0.45,
+            rotation: .degrees(0)
+        ),
+
+        // Face accessories
+        "heart glasses": AccessoryLayout(
+            offset: CGSize(width: 8, height: -30),
+            scale: 0.60,
+            rotation: .degrees(0)
+        ),
+        "sunglasses": AccessoryLayout(
+            offset: CGSize(width: 0, height: -32),
+            scale: 0.55,
+            rotation: .degrees(0)
+        ),
+
+        // Side/head flair
+        "bow": AccessoryLayout(
+            offset: CGSize(width: -35, height: -85),
+            scale: 0.30,
+            rotation: .degrees(-20)
+        ),
+        "angry vien": AccessoryLayout(
+            offset: CGSize(width: 55, height: -80),
+            scale: 0.25,
+            rotation: .degrees(0)
+        ),
+    ]
 
     var body: some View {
         GeometryReader { proxy in
@@ -37,11 +105,29 @@ struct HomeView: View {
                 Color(hex: "EBE3D7").ignoresSafeArea()
                 ScrollView(.vertical){
                     ZStack{
-                        Image("graycat")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 318, height: 318)
-                            .offset(y: -210)
+                        ZStack {
+                            Image(inventory.equippedSpriteImageName)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 318, height: 318)
+
+                            if let accessoryName = inventory.equippedAccessoryImageName {
+                                let layout = accessoryLayouts[accessoryName]
+                                    ?? AccessoryLayout(
+                                        offset: .zero,
+                                        scale: 1.0,
+                                        rotation: .degrees(0)
+                                    )
+
+                                Image(accessoryName)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 318 * layout.scale, height: 318 * layout.scale)
+                                    .offset(layout.offset)
+                                    .rotationEffect(layout.rotation)
+                            }
+                        }
+                        .offset(y: -210)
                         
                         Text("\(hours)h \(minutes)m")
                             .font(.custom("Moulpali-Regular", size: 65))
@@ -424,8 +510,11 @@ struct SessionView: View {
 }
 
 #Preview {
-    HomeView().environmentObject(TabRouter())
+    HomeView()
+        .environmentObject(TabRouter())
+        .environmentObject(InventoryModel())
 }
+
 extension Notification.Name {
     static let scrollToBottomProfile = Notification.Name("scrollToBottomProfile")
 }
