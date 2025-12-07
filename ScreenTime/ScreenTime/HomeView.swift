@@ -12,15 +12,14 @@ struct HomeView: View {
     @EnvironmentObject private var router: TabRouter
     private let barHeight: CGFloat = 78
     @AppStorage("coins") private var coins: Int = 0
-    @State private var elapsedSeconds = 0
-    private var hours: Int   { elapsedSeconds / 3600 }
-    private var minutes: Int { (elapsedSeconds % 3600) / 60 }
-
+    @AppStorage("stats_total_minutes") private var totalSessionMinutes: Int = 0
+    private var hours: Int   { totalSessionMinutes / 60 }
+    private var minutes: Int { totalSessionMinutes % 60 }
     @State private var hourText: String = "0"
     @State private var minuteText: String = "0"
     @State private var clearedHourOnce = false
     @State private var clearedMinuteOnce = false
-
+    
     enum Field { case hours, minutes }
     @FocusState private var focusedField: Field?
 
@@ -300,7 +299,7 @@ struct HomeView: View {
             SessionView(totalSeconds: sessionLengthSeconds) { didComplete, secondsEarned in
                 showSession = false
                 if didComplete {
-                    elapsedSeconds += secondsEarned
+                    totalSessionMinutes += secondsEarned / 60
                 }
             }
         }
