@@ -21,33 +21,39 @@ Welcome to the **Pawse** repository! Pawse is an iOS focus timer and productivit
 - **iOS SDK:** Native APIs for timers, animations, and user interactions.
 
 ## 🛠️ Installation and Setup
+**Clone the Repository**
 ```
 git clone https://github.com/zhangbri/Pawse.git
 ```
 
-**Configure environment**
+**Configure backend**
 - Create a Supabase project
-- Add your Supabase URL and anon key to the project configuration
-- Ensure required permissions are enabled (network access, background tasks if needed)
+- Add your Supabase URL and anon key in the configuration
+- Ensure network permissions are enabled
 
 **Build and run**
 - Select an iOS Simulator or physical device
 - Press **Run (⌘R)** in Xcode
 
-## 🔗 Live Demo
-*Coming Soon — App Store release planned.*
-
 ## 📁 Directory Structure
+- `ScreenTimeApp.swift` – App entry point and root configuration.
 - `AuthRootView.swift` – Root authentication flow controller.
 - `LoginView.swift` – User login interface.
+- `RegisterView.swift` – New user registration flow.
 - `ForgotPasswordView.swift` – Password recovery flow.
-- `HomeView.swift` – Main focus timer and app dashboard.
-- `GachaView.swift` – Gacha reward system UI.
+- `SupabaseManager.swift` – Handles authentication, database access, and backend communication.
+- `TabRouter.swift` – Controls tab navigation and active app state.
+- `NavBar.swift` – Custom tab bar and navigation UI.
+- `HomeView.swift` – Focus timer and main dashboard.
+- `GachaView.swift` – Gacha reward system and unlock animations.
 - `InventoryModel.swift` – Data model for collectible items.
-- `InventoryView.swift` – Displays earned items and rewards.
-- `FriendsView.swift` – Social and friends interactions.
-- `LeaderboardView.swift` – Global and friends-based rankings.
-- `ProfileView.swift` – User profile and statistics.
+- `InventoryView.swift` – Displays unlocked rewards and inventory.
+- `FriendsView.swift` – Friends list and social interactions.
+- `LeaderboardView.swift` – Rankings based on focus sessions.
+- `ProfileView.swift` – User profile and productivity statistics.
+
+## 🔗 Live Demo
+
 
 ## 📸 Screenshots
 <p align="center">
@@ -58,6 +64,3 @@ git clone https://github.com/zhangbri/Pawse.git
   <img width="45%" alt="Inventory View" src="https://your-image-link-here.png">
   <img width="45%" alt="Leaderboard View" src="https://your-image-link-here.png">
 </p>
-
-## 📬 Contact
-For inquiries or feedback, feel free to reach out via email at [zhangbri@umich.edu](mailto:zhangbri@umich.edu) or connect with me on [LinkedIn](https://www.linkedin.com/in/zhangbri/).
