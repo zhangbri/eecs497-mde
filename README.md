@@ -53,7 +53,7 @@ git clone https://github.com/zhangbri/eecs497-mde.git
 - `ProfileView.swift` – User profile and productivity statistics.
 
 ## 🔗 Live Demo
-
+🎥 Video Demo: https://www.youtube.com/watch?v=cB7kviCbirw
 
 ## 📸 Screenshots
 <p align="center">
