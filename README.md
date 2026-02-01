@@ -23,7 +23,12 @@ Welcome to the **Pawse** repository! Pawse is an iOS focus timer and productivit
 ## 🛠️ Installation and Setup
 **Clone the Repository**
 ```
-git clone https://github.com/zhangbri/Pawse.git
+git clone https://github.com/zhangbri/eecs497-mde.git
+```
+
+**Navigate to the Project Directory**
+```
+cd Pawse
 ```
 
 **Configure backend**
