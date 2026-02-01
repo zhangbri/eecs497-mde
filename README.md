@@ -57,10 +57,19 @@ git clone https://github.com/zhangbri/eecs497-mde.git
 
 ## 📸 Screenshots
 <p align="center">
-  <img width="45%" alt="Home View" src="https://your-image-link-here.png">
-  <img width="45%" alt="Gacha View" src="https://your-image-link-here.png">
+  <img width="20%" alt="Login View" src="ScreenTime/ScreenTime/Assets.xcassets/login.png">
+  <img width="20%" alt="Register View" src="ScreenTime/ScreenTime/Assets.xcassets/register.png">
+  <img width="20%" alt="Create Account View" src="ScreenTime/ScreenTime/Assets.xcassets/createaccount.png">
 </p>
+
 <p align="center">
-  <img width="45%" alt="Inventory View" src="https://your-image-link-here.png">
-  <img width="45%" alt="Leaderboard View" src="https://your-image-link-here.png">
+  <img width="20%" alt="Home View" src="ScreenTime/ScreenTime/Assets.xcassets/home.png">
+  <img width="20%" alt="Gacha View" src="ScreenTime/ScreenTime/Assets.xcassets/gacha.png">
+  <img width="20%" alt="Inventory View" src="ScreenTime/ScreenTime/Assets.xcassets/inventory.png">
 </p>
+
+<p align="center">
+  <img width="20%" alt="Leaderboard View" src="ScreenTime/ScreenTime/Assets.xcassets/leaderboard.png">
+  <img width="20%" alt="Profile View" src="ScreenTime/ScreenTime/Assets.xcassets/profile.png">
+</p>
+
